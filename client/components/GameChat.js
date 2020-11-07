@@ -8,7 +8,7 @@ import ChatMessage from './ChatMessage';
 const useStyles = makeStyles((theme) => ({
   guesses: {
     flexGrow: 1,
-    overflowY: 'scroll',
+    overflowY: 'auto',
     display: 'flex',
     flexDirection: 'column',
     order: 2,

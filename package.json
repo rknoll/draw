@@ -10,7 +10,7 @@
     "dev:client": "webpack serve --config webpack.dev.js",
     "dev:server": "NODE_ENV=development nodemon --config nodemon.json index.js",
     "start": "NODE_ENV=production node -r dotenv-defaults/config index.js",
-    "bundle-report": "webpack-bundle-analyzer --port 4200 public/stats.json"
+    "bundle-report": "webpack-bundle-analyzer --port 4200 stats.json"
   },
   "author": {
     "name": "Richard Knoll",

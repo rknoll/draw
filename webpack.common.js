@@ -4,6 +4,8 @@ const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
 const ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
 
+require('dotenv-defaults').config();
+
 module.exports = {
   entry: path.join(__dirname, 'client/index.js'),
   output: {

@@ -1,3 +1,4 @@
+const path = require('path');
 const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
@@ -16,7 +17,11 @@ module.exports = merge(common, {
     minimizer: [new TerserPlugin()],
   },
   plugins: [
-    new BundleAnalyzerPlugin({ analyzerMode: 'disabled', generateStatsFile: true }),
+    new BundleAnalyzerPlugin({
+      analyzerMode: 'disabled',
+      generateStatsFile: true,
+      statsFilename: path.join(__dirname, 'stats.json'),
+    }),
   ],
   profile: true,
   stats: {

@@ -4,3 +4,4 @@ internal/
 .idea
 .env
 .DS_Store
+stats.json

@@ -69,7 +69,7 @@ const useStyles = makeStyles((theme) => ({
     order: 3,
     flexBasis: 'auto',
     maxHeight: '15vh',
-    overflowY: 'scroll',
+    overflowY: 'auto',
     [theme.breakpoints.up('sm')]: {
       order: 1,
       flexBasis: '100%',
