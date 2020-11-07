@@ -1,5 +1,5 @@
 const play = (file) => {
-  const module = require(`../../${process.env.SOUND_FILES}/${file}`);
+  const module = require(`../../assets/sounds/${file}`);
   const audio = new Audio(module.default);
   return async () => {
     try {

@@ -76,4 +76,9 @@ module.exports = {
       entry: path.join(__dirname, 'client/sw.js'),
     }),
   ],
+  resolve: {
+    alias: {
+      [path.resolve(__dirname, './assets/sounds')]: path.resolve(__dirname, process.env.SOUND_FILES),
+    },
+  },
 };
