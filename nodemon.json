@@ -1,0 +1,10 @@
+{
+  "watch": [
+    ".env",
+    "index.js",
+    "server"
+  ],
+  "execMap": {
+    "js": "node -r dotenv-defaults/config index.js"
+  }
+}
