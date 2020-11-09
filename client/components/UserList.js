@@ -4,6 +4,9 @@ import classnames from 'classnames';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
+  root: {
+    flexGrow: 1,
+  },
   player: {
     margin: -8,
     padding: 8,
@@ -81,7 +84,7 @@ const UserList = ({ self, players, correct, currentPlayer, points }) => {
   const userRank = rankUsers(allPoints);
   const allWinners = isAllWinners(allPoints);
 
-  return <div>
+  return <div className={classes.root}>
     {players && players.map(({ id, name }) => {
       const guessedCorrectly = correctSet.has(id) && id !== currentPlayer;
       const isWinner = !allWinners && userRank[id] === 1;
