@@ -3,6 +3,7 @@ const { merge } = require('webpack-merge');
 const common = require('./webpack.common.js');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const TerserPlugin = require('terser-webpack-plugin');
+const GoogleAnalyticsPlugin = require('./plugins/GoogleAnalyticsPlugin');
 
 module.exports = merge(common, {
   mode: 'production',
@@ -22,6 +23,7 @@ module.exports = merge(common, {
       generateStatsFile: true,
       statsFilename: path.join(__dirname, 'stats.json'),
     }),
+    new GoogleAnalyticsPlugin(process.env.ANALYTICS_ID),
   ],
   profile: true,
   stats: {
