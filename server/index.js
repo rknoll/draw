@@ -3,9 +3,25 @@ import express from 'express';
 import http from 'http';
 import compression from 'compression';
 import socketIO from 'socket.io';
+import bunyan from 'bunyan';
+import expressBunyanLogger from 'express-bunyan-logger';
+import bunyanDebugStream from 'bunyan-debug-stream';
 import protocol from '../shared/protocol';
 import validators from './validators';
 import Games from './Games';
+
+const log = bunyan.createLogger({
+  name: 'draw',
+  streams: [{
+    level:  'info',
+    type:   'raw',
+    stream: bunyanDebugStream({
+      basepath: __dirname, // this should be the root folder of your project.
+      forceColor: true,
+    }),
+  }],
+  serializers: bunyanDebugStream.serializers
+});
 
 const statics = path.join(__dirname, '../public');
 
@@ -14,6 +30,10 @@ const port = process.env.PORT || 3000;
 const server = http.createServer(app);
 const io = socketIO(server);
 const games = new Games(io);
+
+app.use(expressBunyanLogger({
+  logger: log,
+}));
 
 app.use(compression());
 
@@ -36,17 +56,17 @@ app.get('*', (req, res) => {
 });
 
 io.sockets.on('connect', async (socket) => {
-  console.log(`${socket.id}: connected`);
+  log.info(`${socket.id}: connected`);
 
   socket.on('disconnect', async () => {
-    console.log(`${socket.id}: disconnected`);
     games.leave(socket.id);
+    log.info(`${socket.id}: disconnected. Running games: ${Object.keys(games.games).length}`);
   });
 
   socket.use(([message, data], next) => {
     const validator = validators[message];
     if (!validator || validator.validate(data).error) {
-      console.log(`${socket.id}: invalid message`);
+      log.warn(`${socket.id}: invalid message: ${JSON.stringify(data)}`);
       return next(new Error('error'));
     }
     next();
@@ -57,10 +77,12 @@ io.sockets.on('connect', async (socket) => {
     Object.keys(socket.rooms).forEach((room) => socket.leave(room));
     socket.join(id, (err) => {
       if (err) {
+        log.error(`Failed to join ${socket.id} with ${id}`);
         socket.disconnect(true);
         return;
       }
       games.join(socket, id, user);
+      log.info(`${socket.id}: joined ${id} as ${user && user.name || '<unknown>'}. Running games: ${Object.keys(games.games).length}`);
     });
   });
 
@@ -70,4 +92,4 @@ io.sockets.on('connect', async (socket) => {
   socket.on(protocol.USE_WORD, (word) => games.useWord(socket.id, word));
 });
 
-server.listen(port, () => console.log(`Listening on port ${port}!`));
+server.listen(port, () => log.info(`Listening on port ${port}!`));
