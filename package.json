@@ -5,11 +5,11 @@
   "homepage": "https://draw.rknoll.at",
   "main": "index.js",
   "scripts": {
-    "build": "NODE_ENV=production webpack --config webpack.prod.js",
+    "build": "cross-env NODE_ENV=production webpack --config webpack.prod.js",
     "dev": "run-p dev:*",
     "dev:client": "webpack serve --config webpack.dev.js",
-    "dev:server": "NODE_ENV=development nodemon --config nodemon.json index.js",
-    "start": "NODE_ENV=production node -r dotenv-defaults/config index.js",
+    "dev:server": "cross-env NODE_ENV=development nodemon --config nodemon.json index.js",
+    "start": "cross-env NODE_ENV=production node -r dotenv-defaults/config index.js",
     "bundle-report": "webpack-bundle-analyzer --port 4200 stats.json"
   },
   "author": {
@@ -25,6 +25,7 @@
     "classnames": "^2.2.6",
     "color-parse": "^1.4.2",
     "connected-react-router": "^6.8.0",
+    "cross-env": "^7.0.2",
     "css-loader": "^5.0.0",
     "dotenv-webpack": "^4.0.0",
     "favicons-webpack-plugin": "^4.2.0",
