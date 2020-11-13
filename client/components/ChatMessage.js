@@ -3,8 +3,15 @@ import classnames from 'classnames';
 import { makeStyles } from '@material-ui/core/styles';
 
 const useStyles = makeStyles((theme) => ({
-  guessName: {
-    wordBreak: 'break-all',
+  userName: {
+    maxWidth: '50%',
+    display: 'inline-block',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+    overflowX: 'hidden',
+    verticalAlign: 'bottom',
+  },
+  boldName: {
     fontWeight: 'bold',
   },
   guessText: {
@@ -29,12 +36,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
+const UserName = ({ name, bold }) => {
+  const classes = useStyles();
+  const className = classnames(classes.userName, bold && classes.boldName);
+  return <span className={className}>{name}</span>;
+};
+
 const Message = ({ name, guess, word, type }) => {
   const classes = useStyles();
   switch (type) {
     case 'GUESS':
       return <React.Fragment>
-        <span className={classes.guessName}>{name}</span>:&nbsp;
+        <UserName name={name} bold />:&nbsp;
         <span className={classes.guessText}>{guess}</span>
       </React.Fragment>;
     case 'CLOSE_GUESS':
@@ -43,7 +56,7 @@ const Message = ({ name, guess, word, type }) => {
         </span>;
     case 'CORRECT_GUESS':
       return <span className={classes.systemText}>
-          {name} guessed the word!
+          <UserName name={name} /> guessed the word!
         </span>;
     case 'ALL_GUESSED':
       return <span className={classes.systemText}>
@@ -55,23 +68,23 @@ const Message = ({ name, guess, word, type }) => {
         </span>;
     case 'SKIPPED':
       return <span className={classes.errorText}>
-          {name} skipped this round!
+          <UserName name={name} /> skipped this round!
         </span>;
     case 'LEAVE_TURN':
       return <span className={classes.errorText}>
-          {name} lost the turn!
+          <UserName name={name} /> lost the turn!
         </span>;
     case 'LEAVE':
       return <span className={classes.systemText}>
-          {name} left the game!
+          <UserName name={name} /> left the game!
         </span>;
     case 'JOIN':
       return <span className={classes.systemText}>
-          {name} joined the game!
+          <UserName name={name} /> joined the game!
         </span>;
     case 'DRAWING':
       return <span className={classes.systemText}>
-          {name} is drawing now!
+          <UserName name={name} /> is drawing now!
         </span>;
     default:
       return null;
