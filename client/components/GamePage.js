@@ -10,6 +10,7 @@ import GameHeader from './GameHeader';
 import GameChat from './GameChat';
 import GameTimer from './GameTimer';
 import Info from './Info';
+import ShareButton from './ShareButton';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -79,6 +80,17 @@ const useStyles = makeStyles((theme) => ({
       maxHeight: '100%',
     },
   },
+  bottomButtons: {
+    display: 'flex',
+    flexDirection: 'row',
+    order: 3,
+    flexBasis: 'auto',
+    overflowY: 'auto',
+    [theme.breakpoints.up('sm')]: {
+      order: 1,
+      maxWidth: '100%',
+    },
+  },
   roundTimer: {
     borderRadius: 4,
   },
@@ -94,7 +106,10 @@ export default () => {
         <Grid container spacing={3} className={classes.wrapper}>
           <Grid item xs={12} sm={2} className={classes.players}>
             <UserList />
-            <Info />
+            <Grid item xs={12} sm={2} className={classes.bottomButtons}>
+              <Info />
+              <ShareButton />
+            </Grid>
           </Grid>
           <Grid item xs={12} sm={7} className={classes.drawing}>
             <Scratchpad />
