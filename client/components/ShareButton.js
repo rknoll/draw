@@ -3,31 +3,24 @@
 import React from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
-import share from '../../assets/shareButton.png';
+import ShareIcon from '@material-ui/icons/Share';
 
 const useStyles = ((canShare) => makeStyles((theme) => ({
   buttonContainer: {
     position: 'absolute',
     bottom: 0,
     right: '12px',
-    paddingTop: '12px',
     paddingBottom: '12px',
     [theme.breakpoints.up('sm')]: {
       position: 'relative',
+      paddingBottom: 0,
     },
     display: canShare ? 'block' : 'none',
   },
   buttonBackground: {
-    backgroundImage: `url("${share}")`,
-    height: '20px',
-    width: '149px',
-    backgroundPosition: '0 0',
-    '&:hover': {
-        'background-position': '0 -20px',
-    },
-    fontSize: '1.25rem',
+    fontSize: '0.75rem',
     [theme.breakpoints.up('sm')]: {
-      fontSize: '1.5rem',
+      fontSize: '1rem',
     },
   },
 })));
@@ -37,6 +30,14 @@ export default () => {
   const classes = useStyles(navigator.canShare && navigator.canShare(shareData))();
   // TODO: handle navigator.share() failures.
   return <div className={classes.buttonContainer}>
-      <Button className={classes.buttonBackground} onClick={() => navigator.share(shareData)} />
+      <Button
+        variant='contained'
+        color='primary'
+        startIcon={<ShareIcon />}
+        className={classes.buttonBackground}
+        onClick={() => navigator.share(shareData)}
+      >
+        Share
+      </Button>
     </div>
 };
