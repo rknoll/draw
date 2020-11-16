@@ -3,13 +3,8 @@ import { connect } from 'react-redux';
 import { withResizeDetector } from 'react-resize-detector';
 import parseColor from 'color-parse';
 import { makeStyles } from '@material-ui/core/styles';
-import { COLORS } from '../../shared/constants';
+import { CANVAS_HEIGHT, CANVAS_WIDTH, COLORS } from '../../shared/constants';
 import gameActions from '../store/actions/game';
-
-const canvasSize = {
-  width: 800,
-  height: 600,
-};
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -116,7 +111,7 @@ const resizeCanvas = (canvas, w, h, connected) => {
   if (!canvas) return;
 
   const ratio = w / h;
-  const targetRatio = canvasSize.width / canvasSize.height;
+  const targetRatio = CANVAS_WIDTH / CANVAS_HEIGHT;
   const width = ratio > targetRatio ? h * targetRatio : w;
   const height = width / targetRatio;
 
@@ -124,6 +119,8 @@ const resizeCanvas = (canvas, w, h, connected) => {
   canvas.style.width = `${Math.round(width)}px`;
   canvas.style.height = `${Math.round(height)}px`;
 };
+
+const clamp = (val, min, max) => val < min ? min : val > max ? max : val;
 
 const Scratchpad = ({ connected, width, height, targetRef, tool, commands, sendCommand, canDraw }) => {
   const classes = useStyles();
@@ -136,7 +133,7 @@ const Scratchpad = ({ connected, width, height, targetRef, tool, commands, sendC
 
   React.useEffect(() => {
     if (!canvasRef.current) return;
-    const cursor = getToolCursor(tool, rainbowLength, width / 800);
+    const cursor = getToolCursor(tool, rainbowLength, width / CANVAS_WIDTH);
     canvasRef.current.style.cursor = cursor;
   }, [canvasRef, tool, width, height, rainbowLength]);
 
@@ -155,8 +152,8 @@ const Scratchpad = ({ connected, width, height, targetRef, tool, commands, sendC
     if (!event.clientX) event = event.changedTouches[0];
 
     return {
-      x: (event.clientX - rect.left) * scaleX,
-      y: (event.clientY - rect.top) * scaleY,
+      x: clamp(Math.round((event.clientX - rect.left) * scaleX), 0, CANVAS_WIDTH),
+      y: clamp(Math.round((event.clientY - rect.top) * scaleY), 0, CANVAS_HEIGHT),
     };
   };
 
@@ -201,7 +198,6 @@ const Scratchpad = ({ connected, width, height, targetRef, tool, commands, sendC
 
     const parsedColor = parseColor(color);
 
-    const clamp = (val, min, max) => val < min ? min : val > max ? max : val;
     const upperWidth = Math.ceil(width / 2);
     let x1 = clamp(Math.floor(from.x), -upperWidth, canvas.width + upperWidth);
     let y1 = clamp(Math.floor(from.y), -upperWidth, canvas.height + upperWidth);
@@ -519,7 +515,7 @@ const Scratchpad = ({ connected, width, height, targetRef, tool, commands, sendC
   }, [exitPaint]);
 
   return <div className={classes.root} ref={targetRef}>
-    <canvas width={canvasSize.width} height={canvasSize.height} ref={canvasRef} className={classes.canvas} />
+    <canvas width={CANVAS_WIDTH} height={CANVAS_HEIGHT} ref={canvasRef} className={classes.canvas} />
   </div>;
 };
 
