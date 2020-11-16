@@ -36,10 +36,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const UserName = ({ name, bold }) => {
+const UserName = ({ name, bold, spacing }) => {
   const classes = useStyles();
   const className = classnames(classes.userName, bold && classes.boldName);
-  return <span className={className}>{name}</span>;
+  return <span className={className}>{name}{spacing && '\u00A0'}</span>;
 };
 
 const Message = ({ name, guess, word, type }) => {
@@ -56,7 +56,7 @@ const Message = ({ name, guess, word, type }) => {
         </span>;
     case 'CORRECT_GUESS':
       return <span className={classes.systemText}>
-          <UserName name={name} /> guessed the word!
+          <UserName name={name} spacing />guessed the word!
         </span>;
     case 'ALL_GUESSED':
       return <span className={classes.systemText}>
@@ -76,15 +76,15 @@ const Message = ({ name, guess, word, type }) => {
         </span>;
     case 'LEAVE':
       return <span className={classes.systemText}>
-          <UserName name={name} /> left the game!
+          <UserName name={name} spacing />left the game!
         </span>;
     case 'JOIN':
       return <span className={classes.systemText}>
-          <UserName name={name} /> joined the game!
+          <UserName name={name} spacing />joined the game!
         </span>;
     case 'DRAWING':
       return <span className={classes.systemText}>
-          <UserName name={name} /> is drawing now!
+          <UserName name={name} spacing />is drawing now!
         </span>;
     default:
       return null;
