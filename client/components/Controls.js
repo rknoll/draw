@@ -33,6 +33,13 @@ const useStyles = makeStyles((theme) => ({
       height: 40,
     },
   },
+  color: {
+    width: '90%',
+    height: '90%',
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: theme.palette.text.primary,
+  },
   line: {
     borderRadius: '50%',
     backgroundColor: theme.palette.text.primary,
@@ -56,14 +63,19 @@ const Controls = ({ tool, updateTool, sendCommand }) => {
   const bottomRow = COLORS.slice(COLORS.length / 2, COLORS.length);
 
   const renderColor = (color) => {
-    const style = { backgroundColor: color };
-    if (tool.color !== color) style.borderColor = 'transparent';
+    const borderStyle = {};
+    if (tool.color !== color) borderStyle.borderColor = 'transparent';
     return <div
       key={color}
       className={classes.tool}
-      style={style}
-      onClick={() => updateTool({ color })}
-    />;
+      style={borderStyle}>
+        <div
+          key={color}
+          className={classes.color}
+          style={{backgroundColor: color}}
+          onClick={() => updateTool({ color })}
+        />
+      </div>;
   };
 
   const renderLine = (thickness) => {
