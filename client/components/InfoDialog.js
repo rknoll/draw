@@ -30,6 +30,13 @@ export default ({ open, onClose }) => {
           {COMMITHASH.substr(0, 7)}
         </a>
       </DialogContentText>
+      <DialogContentText>
+        <b className={classes.key}>Font:</b>
+        <a className={classes.value} target='_blank'
+           href='https://github.com/ipython/xkcd-font'>
+          xkcd-script
+        </a>
+      </DialogContentText>
     </DialogContent>
   </Dialog>;
 };
