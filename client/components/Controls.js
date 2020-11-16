@@ -63,7 +63,6 @@ const Controls = ({ tool, updateTool, sendCommand }) => {
   const bottomRow = COLORS.slice(COLORS.length / 2, COLORS.length);
 
   const renderColor = (color) => {
-    const style = { backgroundColor: color };
     const borderStyle = {};
     if (tool.color !== color) borderStyle.borderColor = 'transparent';
     return <div
@@ -73,7 +72,7 @@ const Controls = ({ tool, updateTool, sendCommand }) => {
         <div
           key={color}
           className={classes.color}
-          style={style}
+          style={{backgroundColor: color}}
           onClick={() => updateTool({ color })}
         />
       </div>;
