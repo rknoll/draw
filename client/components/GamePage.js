@@ -80,12 +80,6 @@ const useStyles = makeStyles((theme) => ({
       maxHeight: '100%',
     },
   },
-  bottomButtons: {
-    display: 'flex',
-    [theme.breakpoints.up('sm')]: {
-      maxWidth: '100%',
-    },
-  },
   roundTimer: {
     borderRadius: 4,
   },
@@ -101,7 +95,7 @@ export default () => {
         <Grid container spacing={3} className={classes.wrapper}>
           <Grid item xs={12} sm={2} className={classes.players}>
             <UserList />
-            <div className={classes.bottomButtons}>
+            <div>
               <Info />
               <ShareButton />
             </div>
