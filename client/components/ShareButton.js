@@ -23,8 +23,8 @@ export default () => {
   const [state, setState] = useState({showSnackbar: false});
   const shareData = {url: window.location.href};
   const canShare = navigator.canShare && navigator.canShare(shareData);
-  const classes = useStyles(
-    canShare || (navigator.clipboard && navigator.clipboard.writeText))();
+  const canCopy = navigator.clipboard && navigator.clipboard.writeText;
+  const classes = useStyles(canShare || canCopy)();
 
   const showSuccess = (message) => setState({
     ...state,
