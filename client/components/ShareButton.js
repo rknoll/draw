@@ -23,16 +23,18 @@ export default () => {
   const shareData = {url: window.location.href};
   const classes = useStyles(navigator.canShare && navigator.canShare(shareData))();
 
-  const share = (shareData) => {
-    navigator.share(shareData).catch((e) => {
-      if (e.name !== "AbortError") {
+  const share = async (shareData) => {
+    try {
+      await navigator.share(shareData);
+    } catch (e) {
+      if (e.name !== 'AbortError') {
         // Failure wasn't due to the user deciding to cancel the share.
         setState({error: e.toString(), showSnackbar: true});
       }
-    });
+    }
   };
 
-  const closeSnackbar = () => setState({showSnackbar: false});
+  const closeSnackbar = () => setState({error: state.error, showSnackbar: false});
   return <div>
       <Button
         variant='contained'
@@ -44,7 +46,7 @@ export default () => {
         Share
       </Button>
       <Snackbar open={state.showSnackbar} autoHideDuration={3000} onClose={closeSnackbar}>
-        <MuiAlert variant="filled" onClose={closeSnackbar} severity="error">
+        <MuiAlert variant='filled' onClose={closeSnackbar} severity='error'>
           Failed to share: {state.error}.
         </MuiAlert>
       </Snackbar>
