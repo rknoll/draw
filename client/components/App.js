@@ -9,6 +9,7 @@ import LandingPage from './LandingPage';
 import GamePage from './GamePage';
 import UserNameDialog from './UserNameDialog';
 import WordSelectionDialog from './WordSelectionDialog';
+import Snackbars from './Snackbars';
 
 export default ({ history }) => {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -22,6 +23,7 @@ export default ({ history }) => {
       </Switch>
       <UserNameDialog />
       <WordSelectionDialog />
+      <Snackbars />
     </ThemeProvider>
   </ConnectedRouter>;
 }
