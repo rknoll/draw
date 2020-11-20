@@ -4,6 +4,7 @@ import Button from '@material-ui/core/Button';
 import ShareIcon from '@material-ui/icons/Share';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+import FileCopyIcon from '@material-ui/icons/FileCopy';
 
 const useStyles = ((canShare) => makeStyles((theme) => ({
   button: {
@@ -21,7 +22,24 @@ const useStyles = ((canShare) => makeStyles((theme) => ({
 export default () => {
   const [state, setState] = useState({showSnackbar: false});
   const shareData = {url: window.location.href};
-  const classes = useStyles(navigator.canShare && navigator.canShare(shareData))();
+  const canShare = navigator.canShare && navigator.canShare(shareData);
+  const canCopy = navigator.clipboard && navigator.clipboard.writeText;
+  const classes = useStyles(canShare || canCopy)();
+
+  const showSuccess = (message) => setState({
+    ...state,
+    snackbarMessage: message,
+    showSnackbar: true,
+    snackbarAutoHideDuration: 1500,
+    snackbarSeverity: 'success'
+  });
+  const showError = (message) => setState({
+    ...state,
+    snackbarMessage: message,
+    showSnackbar: true,
+    snackbarAutoHideDuration: 3000,
+    snackbarSeverity: 'error'
+  });
 
   const share = async (shareData) => {
     try {
@@ -29,25 +47,45 @@ export default () => {
     } catch (e) {
       if (e.name !== 'AbortError') {
         // Failure wasn't due to the user deciding to cancel the share.
-        setState({error: e.toString(), showSnackbar: true});
+        showError(`Failed to share: ${e.toString()}`);
       }
     }
   };
 
-  const closeSnackbar = () => setState({error: state.error, showSnackbar: false});
+  const copyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href);
+      showSuccess('Copied link!');
+    } catch (e) {
+      showError(`Failed to copy link: ${e.toString()}`);
+    }
+  };
+
+  const icon = canShare ? <ShareIcon /> : <FileCopyIcon />;
+  const buttonText = canShare ? 'Share' : 'Copy Link';
+  const buttonAction = canShare ? () => share(shareData) : copyUrl;
+  const closeSnackbar = () => setState({...state, showSnackbar: false});
   return <div>
       <Button
         variant='contained'
         color='primary'
-        startIcon={<ShareIcon />}
+        startIcon={icon}
         className={classes.button}
-        onClick={() => share(shareData)}
+        onClick={buttonAction}
       >
-        Share
+        {buttonText}
       </Button>
-      <Snackbar open={state.showSnackbar} autoHideDuration={3000} onClose={closeSnackbar}>
-        <MuiAlert variant='filled' onClose={closeSnackbar} severity='error'>
-          Failed to share: {state.error}.
+      <Snackbar
+        open={state.showSnackbar}
+        autoHideDuration={state.snackbarAutoHideDuration}
+        onClose={closeSnackbar}
+      >
+        <MuiAlert
+          variant='filled'
+          onClose={closeSnackbar}
+          severity={state.snackbarSeverity}
+        >
+          {state.snackbarMessage}
         </MuiAlert>
       </Snackbar>
     </div>
