@@ -1,4 +1,4 @@
-FROM node:12-slim
+FROM node:14.15.1-slim
 
 ARG SOUND_FILES
 ARG WORDS_FILE
