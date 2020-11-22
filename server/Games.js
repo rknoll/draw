@@ -43,10 +43,10 @@ export default class {
     if (game) game.command(player, command);
   }
 
-  start(playerId) {
+  start(playerId, options) {
     const player = this.players[playerId];
     const game = player && this.games[player.gameId];
-    if (game) game.start();
+    if (game) game.start(options);
   }
 
   useWord(playerId, word) {

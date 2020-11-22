@@ -68,14 +68,15 @@ const Controls = ({ tool, updateTool, sendCommand }) => {
     return <div
       key={color}
       className={classes.tool}
-      style={borderStyle}>
-        <div
-          key={color}
-          className={classes.color}
-          style={{backgroundColor: color}}
-          onClick={() => updateTool({ color })}
-        />
-      </div>;
+      style={borderStyle}
+    >
+      <div
+        key={color}
+        className={classes.color}
+        style={{ backgroundColor: color }}
+        onClick={() => updateTool({ color })}
+      />
+    </div>;
   };
 
   const renderLine = (thickness) => {

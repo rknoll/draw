@@ -13,8 +13,8 @@ import Games from './Games';
 const log = bunyan.createLogger({
   name: 'draw',
   streams: [{
-    level:  'info',
-    type:   'raw',
+    level: 'info',
+    type: 'raw',
     stream: bunyanDebugStream({
       basepath: __dirname, // this should be the root folder of your project.
       forceColor: true,
@@ -88,7 +88,7 @@ io.sockets.on('connect', async (socket) => {
 
   socket.on(protocol.GUESS, (guess) => games.guess(socket.id, guess));
   socket.on(protocol.COMMAND, (command) => games.command(socket.id, command));
-  socket.on(protocol.START, () => games.start(socket.id));
+  socket.on(protocol.START, (options) => games.start(socket.id, options));
   socket.on(protocol.USE_WORD, (word) => games.useWord(socket.id, word));
 });
 

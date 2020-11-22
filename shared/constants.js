@@ -2,12 +2,13 @@ import ms from 'ms';
 
 export const PING_TIMEOUT = ms('10s');
 export const SELECT_WORD_TIMEOUT = ms('10s');
-export const ROUND_TIMEOUT = ms('90s');
 export const TICK_TIMEOUT = ms('8s');
-export const HINT_TIMEOUTS = [
-  ROUND_TIMEOUT / 2,
-  TICK_TIMEOUT,
-];
+
+export const MIN_TURN_TIME_LIMIT_SECONDS = 10;
+export const MAX_TURN_TIME_LIMIT_SECONDS = 3600;
+
+export const MIN_GAME_DURATION_MINUTES = 1;
+export const MAX_GAME_DURATION_MINUTES = 1440;
 
 export const COLORS = [
   '#FFFFFF',
