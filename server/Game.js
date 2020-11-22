@@ -20,7 +20,7 @@ export default class {
   started = false;
   roundTimer = null;
   roundTime = 0;
-  roundTimeout = 0;
+  roundTimeoutSeconds = 0;
   selectTimer = null;
   hintTimeouts = [];
 
@@ -44,7 +44,7 @@ export default class {
       correct: [...this.guessed],
       points: this.points(),
       roundTime: this.roundTime,
-      turnLimit: this.roundTimeout,
+      turnTimeLimitSeconds: this.roundTimeoutSeconds,
       meta,
     });
   }
@@ -66,20 +66,20 @@ export default class {
     this.updateGame({ reason: 'JOIN', name: player.user.name });
   }
 
-  start({ turnLimit, duration }) {
+  start({ turnTimeLimitSeconds, durationMinutes }) {
     if (this.started || this.players.length <= 1) return;
     this.started = true;
     this.hintTimeouts = [
-      turnLimit / 2,
-      TICK_TIMEOUT / 1000,
+      Math.round(turnTimeLimitSeconds / 2),
+      Math.round(TICK_TIMEOUT / 1000),
     ];
-    this.roundTimeout = turnLimit;
+    this.roundTimeoutSeconds = turnTimeLimitSeconds;
 
-    // TODO: limit game to |duration| minutes if it's not null.
+    // TODO: limit game to |durationMinutes| if it's not null.
 
     const nextPlayer = this.nextPlayer();
     if (!nextPlayer) return;
-    this.io.to(this.id).emit(protocol.START, { user: nextPlayer.id, turnLimit });
+    this.io.to(this.id).emit(protocol.START, { user: nextPlayer.id, turnTimeLimitSeconds });
     this.sendWordCandidates();
   }
 
@@ -118,7 +118,7 @@ export default class {
     this.guessed = new Set();
     if (this.roundTimer) clearTimeout(this.roundTimer);
     this.roundTimer = null;
-    this.roundTime = this.roundTimeout;
+    this.roundTime = this.roundTimeoutSeconds;
     const nextPlayer = this.nextPlayer();
     if (!nextPlayer) return;
     this.io.to(this.id).emit(protocol.NEXT_ROUND, {
@@ -186,12 +186,12 @@ export default class {
     this.guessed = new Set([player.id]);
     this.io.to(this.id).emit(protocol.CURRENT_WORD, {
       word: this.currentWordEncoded,
-      roundTime: this.roundTimeout,
+      roundTime: this.roundTimeoutSeconds,
       name: player.user.name,
     });
 
     if (this.roundTimer) clearTimeout(this.roundTimer);
-    this.roundTime = this.roundTimeout;
+    this.roundTime = this.roundTimeoutSeconds;
     this.roundTimer = setTimeout(() => this.tickGameRound(), 1000);
   }
 

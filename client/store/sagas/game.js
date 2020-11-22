@@ -39,7 +39,7 @@ export function* subscribe(socket) {
     socket.on(protocol.JOINED, (data) => emit(gameActions.connectedGame(socket.id, data)));
     socket.on(protocol.GUESSED, ({ name, guess }) => emit(gameActions.guessed(name, guess, false)));
     socket.on(protocol.COMMAND, ({ id, command }) => emit(gameActions.command(id, command)));
-    socket.on(protocol.START, ({ user, turnLimit }) => emit(gameActions.startedGame(user, turnLimit)));
+    socket.on(protocol.START, ({ user, turnTimeLimitSeconds }) => emit(gameActions.startedGame(user, turnTimeLimitSeconds)));
     socket.on(protocol.SELECT_WORD, ({ words }) => emit(gameActions.selectWord(words)));
     socket.on(protocol.CURRENT_WORD, ({ word, roundTime, name }) => emit(gameActions.currentWord(word, roundTime, name)));
     socket.on(protocol.RESET, () => emit(gameActions.reset()));

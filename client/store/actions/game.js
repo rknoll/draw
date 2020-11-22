@@ -75,10 +75,10 @@ export default {
     type: types.START,
     options,
   }),
-  startedGame: (user, turnLimit) => ({
+  startedGame: (user, turnTimeLimitSeconds) => ({
     type: types.STARTED,
     user,
-    turnLimit,
+    turnTimeLimitSeconds,
   }),
   selectWord: (words) => ({
     type: types.SELECT_WORD,

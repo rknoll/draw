@@ -9,11 +9,11 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const GameTimer = ({ showRoundTime, roundTime, turnLimit }) => {
+const GameTimer = ({ showRoundTime, roundTime, turnTimeLimitSeconds }) => {
   const classes = useStyles();
   return <LinearProgress
     variant='determinate'
-    value={100 * roundTime / turnLimit}
+    value={100 * roundTime / turnTimeLimitSeconds}
     className={classes.roundTimer}
     style={{ visibility: showRoundTime ? 'visible' : 'hidden' }}
   />;
@@ -21,7 +21,7 @@ const GameTimer = ({ showRoundTime, roundTime, turnLimit }) => {
 
 const mapStateToProps = (state) => ({
   roundTime: state.game.roundTime,
-  turnLimit: state.game.turnLimit,
+  turnTimeLimitSeconds: state.game.turnTimeLimitSeconds,
   showRoundTime: state.game.currentWord && state.game.roundTime,
 });
 

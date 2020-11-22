@@ -1,5 +1,12 @@
 import Joi from 'joi/lib/index';
-import { COLORS, WIDTHS } from '../shared/constants';
+import {
+  COLORS,
+  MAX_GAME_DURATION_MINUTES,
+  MAX_TURN_TIME_LIMIT_SECONDS,
+  MIN_GAME_DURATION_MINUTES,
+  MIN_TURN_TIME_LIMIT_SECONDS,
+  WIDTHS
+} from '../shared/constants';
 import protocol from '../shared/protocol';
 
 const validPosition = Joi.object({
@@ -18,9 +25,9 @@ export default {
   }).required(),
   [protocol.PONG]: Joi.any(),
   [protocol.START]: Joi.object({
-    turnLimit: Joi.number().integer().min(10).max(3600).required(),
-    duration: Joi.alternatives().try(
-      Joi.number().integer().min(1).max(1440).required(),
+    turnTimeLimitSeconds: Joi.number().integer().min(MIN_TURN_TIME_LIMIT_SECONDS).max(MAX_TURN_TIME_LIMIT_SECONDS).required(),
+    durationMinutes: Joi.alternatives().try(
+      Joi.number().integer().min(MIN_GAME_DURATION_MINUTES).max(MAX_GAME_DURATION_MINUTES).required(),
       Joi.valid(null).required(),
     ).required(),
   }).required(),

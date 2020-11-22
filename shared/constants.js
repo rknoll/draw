@@ -4,6 +4,12 @@ export const PING_TIMEOUT = ms('10s');
 export const SELECT_WORD_TIMEOUT = ms('10s');
 export const TICK_TIMEOUT = ms('8s');
 
+export const MIN_TURN_TIME_LIMIT_SECONDS = 10;
+export const MAX_TURN_TIME_LIMIT_SECONDS = 3600;
+
+export const MIN_GAME_DURATION_MINUTES = 1;
+export const MAX_GAME_DURATION_MINUTES = 1440;
+
 export const COLORS = [
   '#FFFFFF',
   '#C1C1C1',

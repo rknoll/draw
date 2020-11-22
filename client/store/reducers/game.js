@@ -17,7 +17,7 @@ const initialState = {
   correct: [],
   points: {},
   roundTime: 0,
-  turnLimit: 0,
+  turnTimeLimitSeconds: 0,
 };
 
 const addMessage = (state, message) => ({ ...state, guesses: [...state.guesses, message] });
@@ -38,7 +38,7 @@ export default (state = initialState, action) => {
         words: [],
         points: {},
         roundTime: 0,
-        turnLimit: 0,
+        turnTimeLimitSeconds: 0,
       };
     case types.CONNECTED_GAME: {
       const { meta, ...rest } = action.data;
@@ -81,7 +81,7 @@ export default (state = initialState, action) => {
         correct: [],
         points: {},
         roundTime: 0,
-        turnLimit: 0,
+        turnTimeLimitSeconds: 0,
       };
     case types.GUESSED:
       return addMessage(state, { type: 'GUESS', name: action.name, guess: action.guess, correct: action.correct });
@@ -109,7 +109,7 @@ export default (state = initialState, action) => {
         currentPlayer: action.user,
         correct: [action.user],
         points: {},
-        turnLimit: action.turnLimit,
+        turnTimeLimitSeconds: action.turnTimeLimitSeconds,
       };
     case types.SELECT_WORD:
       return {
@@ -195,7 +195,7 @@ export default (state = initialState, action) => {
         correct: [],
         points: {},
         roundTime: 0,
-        turnLimit: 0,
+        turnTimeLimitSeconds: 0,
       };
     default:
       return state;

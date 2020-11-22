@@ -10,6 +10,12 @@ import ScheduleIcon from '@material-ui/icons/Schedule';
 import TextField from '@material-ui/core/TextField';
 import InputAdornment from '@material-ui/core/InputAdornment';
 import { connect } from 'react-redux';
+import {
+  MAX_GAME_DURATION_MINUTES,
+  MAX_TURN_TIME_LIMIT_SECONDS,
+  MIN_GAME_DURATION_MINUTES,
+  MIN_TURN_TIME_LIMIT_SECONDS
+} from '../../shared/constants';
 import gameActions from '../store/actions/game';
 
 const useStyles = makeStyles((theme) => ({
@@ -43,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const DEFAULT_TURN_LIMIT = 90;
+const DEFAULT_TURN_TIME_LIMIT_SECONDS = 90;
 
 const getNextHour = () => {
   const now = moment();
@@ -59,14 +65,14 @@ const getDurationInMinutes = (end) => {
 
 const StartGameDialog = ({ starting, startGame, setStarting }) => {
   const classes = useStyles();
-  const [turnLimit, setTurnLimit] = React.useState(DEFAULT_TURN_LIMIT);
+  const [turnTimeLimitSeconds, setTurnTimeLimitSeconds] = React.useState(DEFAULT_TURN_TIME_LIMIT_SECONDS);
   const [timeLimit, setTimeLimit] = React.useState(null);
-  const [duration, setDuration] = React.useState(null);
+  const [durationMinutes, setDurationMinutes] = React.useState(null);
 
   const updateTimeLimit = (limit) => {
     if (!limit) {
       setTimeLimit(null);
-      setDuration(null);
+      setDurationMinutes(null);
       return;
     }
 
@@ -74,7 +80,7 @@ const StartGameDialog = ({ starting, startGame, setStarting }) => {
     const diffDays = moment.duration(nextLimit.diff(moment())).asDays();
     nextLimit.subtract(Math.floor(diffDays), 'days');
     setTimeLimit(nextLimit);
-    setDuration(getDurationInMinutes(nextLimit));
+    setDurationMinutes(getDurationInMinutes(nextLimit));
   };
   const setNextHour = () => updateTimeLimit(getNextHour());
   const setUnlimited = () => updateTimeLimit(null);
@@ -85,19 +91,19 @@ const StartGameDialog = ({ starting, startGame, setStarting }) => {
 
   React.useEffect(() => {
     if (!starting) return;
-    setTurnLimit(DEFAULT_TURN_LIMIT);
+    setTurnTimeLimitSeconds(DEFAULT_TURN_TIME_LIMIT_SECONDS);
     setNextHour();
   }, [starting]);
 
-  const turnLimitInt = parseInt(turnLimit);
-  const isValid = turnLimitInt >= 10 && turnLimitInt <= 3600 &&
-    ((duration >= 1 && duration <= 1440) || (duration === null));
+  const turnTimeLimitSecondsInt = parseInt(turnTimeLimitSeconds);
+  const isValid = turnTimeLimitSecondsInt >= MIN_TURN_TIME_LIMIT_SECONDS && turnTimeLimitSecondsInt <= MAX_TURN_TIME_LIMIT_SECONDS &&
+    ((durationMinutes >= MIN_GAME_DURATION_MINUTES && durationMinutes <= MAX_GAME_DURATION_MINUTES) || (durationMinutes === null));
 
   const startClick = () => {
     if (!isValid) return;
     startGame({
-      turnLimit: turnLimitInt,
-      duration,
+      turnTimeLimitSeconds: turnTimeLimitSecondsInt,
+      durationMinutes,
     });
   };
 
@@ -107,17 +113,17 @@ const StartGameDialog = ({ starting, startGame, setStarting }) => {
         className={classes.input}
         label='Turn limit'
         type='number'
-        value={turnLimit}
-        onChange={(event) => setTurnLimit(event.target.value)}
+        value={turnTimeLimitSeconds}
+        onChange={(event) => setTurnTimeLimitSeconds(event.target.value)}
         InputProps={{
           endAdornment: <InputAdornment position='end'>
-            {turnLimitInt === 1 ? 'Second' : 'Seconds'}
+            {turnTimeLimitSecondsInt === 1 ? 'Second' : 'Seconds'}
           </InputAdornment>,
         }}
         inputProps={{
           className: classes.turnInput,
-          min: 10,
-          max: 3600,
+          min: MIN_TURN_TIME_LIMIT_SECONDS,
+          max: MAX_TURN_TIME_LIMIT_SECONDS,
         }}
       />
     </DialogContent>
@@ -147,7 +153,7 @@ const StartGameDialog = ({ starting, startGame, setStarting }) => {
     </DialogContent>
     <DialogActions>
       <span className={classes.duration}>
-        {duration !== null ? duration : '∞'} {duration === 1 ? 'Minute' : 'Minutes'}
+        {durationMinutes !== null ? durationMinutes : '∞'} {durationMinutes === 1 ? 'Minute' : 'Minutes'}
       </span>
       <Button disabled={!isValid} variant='contained' color='primary' onClick={startClick}>
         Start Game
