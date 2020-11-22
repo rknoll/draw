@@ -17,7 +17,13 @@ export default {
     }).required(),
   }).required(),
   [protocol.PONG]: Joi.any(),
-  [protocol.START]: Joi.any(),
+  [protocol.START]: Joi.object({
+    turnLimit: Joi.number().integer().min(10).max(3600).required(),
+    duration: Joi.alternatives().try(
+      Joi.number().integer().min(1).max(1440).required(),
+      Joi.valid(null).required(),
+    ).required(),
+  }).required(),
   [protocol.GUESS]: Joi.string().min(1).max(255).required(),
   [protocol.USE_WORD]: Joi.string().allow('').max(255).required(),
   [protocol.COMMAND]: Joi.alternatives([

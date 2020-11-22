@@ -8,6 +8,7 @@ const initialState = {
   self: '',
   guesses: [],
   commands: [],
+  starting: false,
   started: false,
   words: [],
   currentWord: '',
@@ -16,6 +17,7 @@ const initialState = {
   correct: [],
   points: {},
   roundTime: 0,
+  turnLimit: 0,
 };
 
 const addMessage = (state, message) => ({ ...state, guesses: [...state.guesses, message] });
@@ -31,10 +33,12 @@ export default (state = initialState, action) => {
         self: '',
         commands: [],
         connected: false,
+        starting: false,
         started: false,
         words: [],
         points: {},
         roundTime: 0,
+        turnLimit: 0,
       };
     case types.CONNECTED_GAME: {
       const { meta, ...rest } = action.data;
@@ -45,6 +49,7 @@ export default (state = initialState, action) => {
         connecting: false,
         connected: true,
       };
+      if (nextState.players.length <= 1) nextState.starting = false;
       switch (meta.reason) {
         case 'JOIN':
           nextState = addMessage(nextState, { type: 'JOIN', name: meta.name });
@@ -67,6 +72,7 @@ export default (state = initialState, action) => {
         guesses: [],
         commands: [],
         connected: false,
+        starting: false,
         started: false,
         words: [],
         currentWord: '',
@@ -75,6 +81,7 @@ export default (state = initialState, action) => {
         correct: [],
         points: {},
         roundTime: 0,
+        turnLimit: 0,
       };
     case types.GUESSED:
       return addMessage(state, { type: 'GUESS', name: action.name, guess: action.guess, correct: action.correct });
@@ -88,14 +95,21 @@ export default (state = initialState, action) => {
           { id: action.id, command: action.command },
         ],
       };
+    case types.SET_STARTING:
+      return {
+        ...state,
+        starting: action.starting,
+      };
     case types.STARTED:
       return {
         ...state,
+        starting: false,
         started: true,
         commands: [],
         currentPlayer: action.user,
         correct: [action.user],
         points: {},
+        turnLimit: action.turnLimit,
       };
     case types.SELECT_WORD:
       return {
@@ -175,11 +189,13 @@ export default (state = initialState, action) => {
         words: [],
         currentWord: '',
         selectedWord: '',
+        starting: false,
         started: false,
         currentPlayer: '',
         correct: [],
         points: {},
         roundTime: 0,
+        turnLimit: 0,
       };
     default:
       return state;

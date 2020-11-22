@@ -68,11 +68,11 @@ const Message = ({ name, guess, word, type }) => {
         </span>;
     case 'SKIPPED':
       return <span className={classes.errorText}>
-          <UserName name={name} /> skipped this round!
+          <UserName name={name} spacing />skipped this round!
         </span>;
     case 'LEAVE_TURN':
       return <span className={classes.errorText}>
-          <UserName name={name} /> lost the turn!
+          <UserName name={name} spacing />lost the turn!
         </span>;
     case 'LEAVE':
       return <span className={classes.systemText}>

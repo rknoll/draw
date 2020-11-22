@@ -9,6 +9,7 @@ export const types = actionTypes('game')({
   GUESSED: 'GUESSED',
   SEND_COMMAND: 'SEND_COMMAND',
   COMMAND: 'COMMAND',
+  SET_STARTING: 'SET_STARTING',
   START: 'START',
   STARTED: 'STARTED',
   SELECT_WORD: 'SELECT_WORD',
@@ -66,12 +67,18 @@ export default {
     id,
     command,
   }),
-  startGame: () => ({
-    type: types.START,
+  setStarting: (starting) => ({
+    type: types.SET_STARTING,
+    starting,
   }),
-  startedGame: (user) => ({
+  startGame: (options) => ({
+    type: types.START,
+    options,
+  }),
+  startedGame: (user, turnLimit) => ({
     type: types.STARTED,
     user,
+    turnLimit,
   }),
   selectWord: (words) => ({
     type: types.SELECT_WORD,

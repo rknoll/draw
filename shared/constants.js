@@ -2,12 +2,7 @@ import ms from 'ms';
 
 export const PING_TIMEOUT = ms('10s');
 export const SELECT_WORD_TIMEOUT = ms('10s');
-export const ROUND_TIMEOUT = ms('90s');
 export const TICK_TIMEOUT = ms('8s');
-export const HINT_TIMEOUTS = [
-  ROUND_TIMEOUT / 2,
-  TICK_TIMEOUT,
-];
 
 export const COLORS = [
   '#FFFFFF',

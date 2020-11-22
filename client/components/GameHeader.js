@@ -43,8 +43,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const GameHeader = ({ singlePlayer, exit, start, started, word }) => {
+const GameHeader = ({ singlePlayer, exit, setStarting, started, word }) => {
   const classes = useStyles();
+  const start = () => setStarting(true);
 
   return <Grid container spacing={3} className={classes.header}>
     <Grid item xs={12} className={classes.headerCell}>
@@ -74,7 +75,7 @@ const mapStateToProps = (state) => ({
 
 const mapDispatchToProps = {
   exit: gameActions.exitGame,
-  start: gameActions.startGame,
+  setStarting: gameActions.setStarting,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(GameHeader);

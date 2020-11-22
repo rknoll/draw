@@ -1,5 +1,5 @@
 import levenshtein from 'fast-levenshtein';
-import { HINT_TIMEOUTS, PING_TIMEOUT, ROUND_TIMEOUT, SELECT_WORD_TIMEOUT } from '../shared/constants';
+import { PING_TIMEOUT, SELECT_WORD_TIMEOUT, TICK_TIMEOUT } from '../shared/constants';
 import protocol from '../shared/protocol';
 
 const words = require(`../${process.env.WORDS_FILE}`);
@@ -19,8 +19,10 @@ export default class {
   round = 0;
   started = false;
   roundTimer = null;
-  roundTime = Math.round(ROUND_TIMEOUT / 1000);
-  selectTimeout = null;
+  roundTime = 0;
+  roundTimeout = 0;
+  selectTimer = null;
+  hintTimeouts = [];
 
   constructor(io, id) {
     this.io = io;
@@ -42,6 +44,7 @@ export default class {
       correct: [...this.guessed],
       points: this.points(),
       roundTime: this.roundTime,
+      turnLimit: this.roundTimeout,
       meta,
     });
   }
@@ -63,12 +66,20 @@ export default class {
     this.updateGame({ reason: 'JOIN', name: player.user.name });
   }
 
-  start() {
+  start({ turnLimit, duration }) {
     if (this.started || this.players.length <= 1) return;
     this.started = true;
+    this.hintTimeouts = [
+      turnLimit / 2,
+      TICK_TIMEOUT / 1000,
+    ];
+    this.roundTimeout = turnLimit;
+
+    // TODO: limit game to |duration| minutes if it's not null.
+
     const nextPlayer = this.nextPlayer();
     if (!nextPlayer) return;
-    this.io.to(this.id).emit(protocol.START, { user: nextPlayer.id });
+    this.io.to(this.id).emit(protocol.START, { user: nextPlayer.id, turnLimit });
     this.sendWordCandidates();
   }
 
@@ -107,7 +118,7 @@ export default class {
     this.guessed = new Set();
     if (this.roundTimer) clearTimeout(this.roundTimer);
     this.roundTimer = null;
-    this.roundTime = Math.round(ROUND_TIMEOUT / 1000);
+    this.roundTime = this.roundTimeout;
     const nextPlayer = this.nextPlayer();
     if (!nextPlayer) return;
     this.io.to(this.id).emit(protocol.NEXT_ROUND, {
@@ -134,8 +145,8 @@ export default class {
     this.currentCandidates = candidates;
     player.socket.emit(protocol.SELECT_WORD, { words: candidates });
     ++this.round;
-    if (this.selectTimeout) clearTimeout(this.selectTimeout);
-    this.selectTimeout = setTimeout(() => this.nextRound({
+    if (this.selectTimer) clearTimeout(this.selectTimer);
+    this.selectTimer = setTimeout(() => this.nextRound({
       reason: 'SKIPPED',
       name: player.user.name
     }), SELECT_WORD_TIMEOUT);
@@ -160,8 +171,8 @@ export default class {
     if (this.currentPlayer !== player.id) return;
     if (word && !this.currentCandidates.includes(word)) return;
 
-    if (this.selectTimeout) clearTimeout(this.selectTimeout);
-    this.selectTimeout = null;
+    if (this.selectTimer) clearTimeout(this.selectTimer);
+    this.selectTimer = null;
 
     if (!word) {
       this.nextRound({ reason: 'SKIPPED', name: player.user.name });
@@ -175,12 +186,12 @@ export default class {
     this.guessed = new Set([player.id]);
     this.io.to(this.id).emit(protocol.CURRENT_WORD, {
       word: this.currentWordEncoded,
-      roundTime: Math.round(ROUND_TIMEOUT / 1000),
+      roundTime: this.roundTimeout,
       name: player.user.name,
     });
 
     if (this.roundTimer) clearTimeout(this.roundTimer);
-    this.roundTime = Math.round(ROUND_TIMEOUT / 1000);
+    this.roundTime = this.roundTimeout;
     this.roundTimer = setTimeout(() => this.tickGameRound(), 1000);
   }
 
@@ -235,8 +246,7 @@ export default class {
         if (this.currentWord[i] !== ' ' && this.currentWordEncoded[i] === '_') indices.push(i);
       }
 
-      const hintTimeouts = HINT_TIMEOUTS.map(ms => Math.floor(ms / 1000));
-      if (hintTimeouts.includes(this.roundTime) && indices.length >= 3) {
+      if (this.hintTimeouts.includes(this.roundTime) && indices.length >= 3) {
         const randomIndex = indices[Math.floor(Math.random() * indices.length)];
 
         this.currentWordEncoded =
@@ -262,11 +272,12 @@ export default class {
     this.currentPlayer = '';
     this.currentCandidates = [];
     this.guessed = new Set();
+    this.hintTimeouts = [];
     if (this.roundTimer) clearTimeout(this.roundTimer);
     this.roundTimer = null;
-    this.roundTime = Math.round(ROUND_TIMEOUT / 1000);
-    if (this.selectTimeout) clearTimeout(this.selectTimeout);
-    this.selectTimeout = null;
+    this.roundTime = 0;
+    if (this.selectTimer) clearTimeout(this.selectTimer);
+    this.selectTimer = null;
     for (const player of this.players) {
       player.reset();
     }
