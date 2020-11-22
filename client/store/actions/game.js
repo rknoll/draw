@@ -21,6 +21,7 @@ export const types = actionTypes('game')({
   OTHER_CORRECT_GUESS: 'OTHER_CORRECT_GUESS',
   ROUND_TIME: 'ROUND_TIME',
   CLOSE_GUESS: 'CLOSE_GUESS',
+  GAME_OVER: 'GAME_OVER',
 });
 
 export default {
@@ -108,5 +109,9 @@ export default {
   roundTime: (roundTime) => ({
     type: types.ROUND_TIME,
     roundTime,
+  }),
+  gameOver: (data) => ({
+    type: types.GAME_OVER,
+    ...data,
   }),
 };

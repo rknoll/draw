@@ -55,6 +55,7 @@ export function* subscribe(socket) {
       emit(gameActions.correctGuess(guess));
     });
     socket.on(protocol.NEXT_ROUND, (data) => emit(gameActions.nextRound(data)));
+    socket.on(protocol.GAME_OVER, (data) => emit(gameActions.gameOver(data)));
     socket.on('disconnect', () => emit(gameActions.exitGame()));
     return () => {};
   });
