@@ -16,4 +16,5 @@ export default {
   RESET: 'RESET',
   ROUND_TIMER: 'ROUND_TIMER',
   CLOSE_GUESS: 'CLOSE_GUESS',
+  GAME_OVER: 'GAME_OVER',
 };

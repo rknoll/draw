@@ -182,6 +182,35 @@ export default (state = initialState, action) => {
       }
       return nextState;
     }
+    case types.GAME_OVER: {
+      let nextState = {
+        ...state,
+        starting: false,
+        started: false,
+        commands: action.commands,
+        words: [],
+        currentWord: '',
+        selectedWord: '',
+        currentPlayer: '',
+        correct: [],
+        points: action.points,
+        roundTime: 0,
+      };
+      switch (action.meta.reason) {
+        case 'SUCCESS':
+          nextState = addMessage(nextState, { type: 'ALL_GUESSED', correct: true });
+          break;
+        case 'FAILED_GUESS':
+          nextState = addMessage(nextState, { type: 'FAILED_GUESS', word: action.meta.word });
+          break;
+        case 'LEAVE':
+          nextState = addMessage(nextState, { type: 'LEAVE_TURN', name: action.meta.name });
+          break;
+        default:
+          break;
+      }
+      return nextState;
+    }
     case types.RESET:
       return {
         ...state,

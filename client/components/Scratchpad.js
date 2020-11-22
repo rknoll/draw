@@ -107,7 +107,7 @@ const resizeCanvas = (canvas, w, h, connected) => {
   canvas.style.height = `${Math.round(height)}px`;
 };
 
-const Scratchpad = ({ started, connected, width, height, targetRef, tool, commands, sendCommand, selectedWord }) => {
+const Scratchpad = ({ connected, width, height, targetRef, tool, commands, sendCommand, canDraw }) => {
   const classes = useStyles();
   const canvasRef = React.useRef(null);
   const [drawnCommands, setDrawnCommands] = React.useState([]);
@@ -141,7 +141,40 @@ const Scratchpad = ({ started, connected, width, height, targetRef, tool, comman
     };
   };
 
-  const drawLineCommand = function ({ from, to, color, width }) {
+  const drawLeaderboard = (points) => {
+    if (!canvasRef.current) return;
+    const canvas = canvasRef.current;
+    const context = canvas.getContext('2d');
+    if (!context) return;
+
+    context.fillStyle = '#2d2d2d';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    context.shadowBlur = 40;
+    context.shadowColor = '#FFFFFF';
+    context.fillStyle = '#FFFFFF';
+    context.font = '72px xkcd-script, Roboto, Helvetica, Arial, sans-serif';
+
+    context.textAlign = 'center';
+    context.fillText('🏆 Leaderboard 🏆', 400, 150);
+
+    const colors = [
+      '#D4AF37',
+      '#B4B4B4',
+      '#A0522D',
+    ];
+
+    const ranked = points.filter(({ player }) => player).sort((a, b) => b.points - a.points);
+    context.textAlign = 'start';
+    for (let i = 0, r = 1; i < ranked.length && i < 3; ++i) {
+      const { player, points } = ranked[i];
+      context.fillStyle = colors[r - 1];
+      context.fillText(`#${r} ${player.name}`, 100, 300 + i * 100);
+      if (i < ranked.length - 1 && ranked[i + 1].points !== points) ++r;
+    }
+  };
+
+  const drawLineCommand = ({ from, to, color, width }) => {
     if (!canvasRef.current) return;
     const canvas = canvasRef.current;
     const context = canvas.getContext('2d');
@@ -283,6 +316,8 @@ const Scratchpad = ({ started, connected, width, height, targetRef, tool, comman
         return floodFillCommand(command);
       case 'clear':
         return clearCommand();
+      case 'over':
+        return drawLeaderboard(command.points);
       default:
         break;
     }
@@ -310,6 +345,7 @@ const Scratchpad = ({ started, connected, width, height, targetRef, tool, comman
 
       const lastBarrier = findLastBarrier(index - 1);
       if (lastBarrier === -1) continue;
+      if (realCommands[lastBarrier].command.type === 'over') continue;
 
       if (realCommands[lastBarrier].command.type !== 'done') {
         realCommands.splice(lastBarrier, 1);
@@ -355,7 +391,7 @@ const Scratchpad = ({ started, connected, width, height, targetRef, tool, comman
   }
 
   const drawLine = React.useCallback((from, to) => {
-    if (started && !selectedWord) return;
+    if (!canDraw) return;
     sendCommand({
       type: tool.type,
       color: tool.color,
@@ -363,25 +399,25 @@ const Scratchpad = ({ started, connected, width, height, targetRef, tool, comman
       from,
       to,
     });
-  }, [tool, started, selectedWord]);
+  }, [tool, canDraw]);
 
   const eraseLine = React.useCallback((from, to) => {
-    if (started && !selectedWord) return;
+    if (!canDraw) return;
     sendCommand({
       type: tool.type,
       from,
       to,
     });
-  }, [tool, started, selectedWord]);
+  }, [tool, canDraw]);
 
   const floodFill = React.useCallback((position) => {
-    if (started && !selectedWord) return;
+    if (!canDraw) return;
     sendCommand({
       type: tool.type,
       color: tool.color,
       position,
     });
-  }, [tool, started, selectedWord]);
+  }, [tool, canDraw]);
 
   const startPaint = React.useCallback((event) => {
     const coordinates = getCoordinates(event);
@@ -443,8 +479,9 @@ const Scratchpad = ({ started, connected, width, height, targetRef, tool, comman
   const exitPaint = React.useCallback(() => {
     if (!isPainting) return;
     setIsPainting(false);
+    if (!canDraw) return;
     if (tool.type === 'line' || tool.type === 'erase') sendCommand({ type: 'done' });
-  }, [isPainting, tool]);
+  }, [isPainting, tool, canDraw]);
 
   React.useEffect(() => {
     if (!canvasRef) return;
@@ -467,8 +504,7 @@ const Scratchpad = ({ started, connected, width, height, targetRef, tool, comman
 };
 
 const mapStateToProps = (state) => ({
-  selectedWord: state.game.selectedWord,
-  started: state.game.started,
+  canDraw: !state.game.started || state.game.selectedWord,
   commands: state.game.commands,
   connected: state.game.connected,
   tool: state.tool,

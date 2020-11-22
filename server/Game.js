@@ -1,4 +1,5 @@
 import levenshtein from 'fast-levenshtein';
+import moment from 'moment';
 import { PING_TIMEOUT, SELECT_WORD_TIMEOUT, TICK_TIMEOUT } from '../shared/constants';
 import protocol from '../shared/protocol';
 
@@ -23,6 +24,7 @@ export default class {
   roundTimeoutSeconds = 0;
   selectTimer = null;
   hintTimeouts = [];
+  endTime = null;
 
   constructor(io, id) {
     this.io = io;
@@ -74,9 +76,11 @@ export default class {
       Math.round(TICK_TIMEOUT / 1000),
     ];
     this.roundTimeoutSeconds = turnTimeLimitSeconds;
-
-    // TODO: limit game to |durationMinutes| if it's not null.
-
+    if (durationMinutes) this.endTime = moment().add(durationMinutes, 'minutes');
+    for (const player of this.players) {
+      player.reset();
+    }
+    this.commands = [];
     const nextPlayer = this.nextPlayer();
     if (!nextPlayer) return;
     this.io.to(this.id).emit(protocol.START, { user: nextPlayer.id, turnTimeLimitSeconds });
@@ -119,6 +123,13 @@ export default class {
     if (this.roundTimer) clearTimeout(this.roundTimer);
     this.roundTimer = null;
     this.roundTime = this.roundTimeoutSeconds;
+
+    const roundFinished = meta && meta.reason !== 'SKIPPED';
+    if (roundFinished && this.started && this.endTime && moment() >= this.endTime) {
+      this.gameOver(meta);
+      return;
+    }
+
     const nextPlayer = this.nextPlayer();
     if (!nextPlayer) return;
     this.io.to(this.id).emit(protocol.NEXT_ROUND, {
@@ -262,6 +273,45 @@ export default class {
     this.roundTimer = setTimeout(() => this.tickGameRound(), 1000);
   }
 
+  gameOver(meta) {
+    const points = this.points();
+    this.words = new Set();
+    this.started = false;
+    this.round = 0;
+    this.commands = [{
+      command: {
+        type: 'over',
+        points: Object.entries(points).map(([id, points]) => {
+          const player = this.players.find(p => p.id === id);
+          return {
+            player: {
+              id: player.id,
+              name: player.user.name,
+            },
+            points,
+          };
+        }),
+      }
+    }];
+    this.currentWord = '';
+    this.currentWordEncoded = '';
+    this.currentPlayer = '';
+    this.currentCandidates = [];
+    this.guessed = new Set();
+    this.hintTimeouts = [];
+    if (this.roundTimer) clearTimeout(this.roundTimer);
+    this.roundTimer = null;
+    this.roundTime = 0;
+    if (this.selectTimer) clearTimeout(this.selectTimer);
+    this.selectTimer = null;
+    this.endTime = null;
+    this.io.to(this.id).emit(protocol.GAME_OVER, {
+      points,
+      meta,
+      commands: this.commands,
+    });
+  }
+
   reset() {
     this.words = new Set();
     this.started = false;
@@ -278,6 +328,7 @@ export default class {
     this.roundTime = 0;
     if (this.selectTimer) clearTimeout(this.selectTimer);
     this.selectTimer = null;
+    this.endTime = null;
     for (const player of this.players) {
       player.reset();
     }
