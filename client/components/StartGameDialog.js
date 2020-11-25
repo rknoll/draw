@@ -1,5 +1,12 @@
 import React from 'react';
-import moment from 'moment';
+import {
+  addDays,
+  addHours,
+  addMinutes,
+  differenceInDays,
+  differenceInMinutes,
+  startOfHour
+} from 'date-fns';
 import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
@@ -52,15 +59,15 @@ const useStyles = makeStyles((theme) => ({
 const DEFAULT_TURN_TIME_LIMIT_SECONDS = 90;
 
 const getNextHour = () => {
-  const now = moment();
-  return now.add(1, 'hour').startOf('hour');
+  const now = new Date();
+  return startOfHour(addHours(now, 1));
 };
 
 const getDurationInMinutes = (end) => {
   if (!end) return null;
-  const now = moment();
-  if (end < now) end = end.clone().add(1, 'day');
-  return Math.round(moment.duration(end.diff(now)).asMinutes());
+  const now = new Date();
+  if (end < now) end = addDays(end, 1);
+  return differenceInMinutes(end, now);
 };
 
 const StartGameDialog = ({ starting, startGame, setStarting }) => {
@@ -76,16 +83,15 @@ const StartGameDialog = ({ starting, startGame, setStarting }) => {
       return;
     }
 
-    const nextLimit = limit.clone();
-    const diffDays = moment.duration(nextLimit.diff(moment())).asDays();
-    nextLimit.subtract(Math.floor(diffDays), 'days');
+    const diffDays = differenceInDays(new Date(), limit);
+    const nextLimit = addDays(limit, diffDays);
     setTimeLimit(nextLimit);
     setDurationMinutes(getDurationInMinutes(nextLimit));
   };
   const setNextHour = () => updateTimeLimit(getNextHour());
   const setUnlimited = () => updateTimeLimit(null);
-  const addMinutes = (minutes) => () => {
-    updateTimeLimit(timeLimit.clone().add(minutes, 'm'));
+  const handleAddMinutes = (minutes) => () => {
+    updateTimeLimit(addMinutes(timeLimit, minutes));
   };
   const closeDialog = () => setStarting(false);
 
@@ -144,10 +150,10 @@ const StartGameDialog = ({ starting, startGame, setStarting }) => {
       <Button size='small' variant='outlined' onClick={setNextHour}>
         Next Full Hour
       </Button>
-      <Button disabled={timeLimit === null} size='small' variant='outlined' onClick={addMinutes(-15)}>
+      <Button disabled={timeLimit === null} size='small' variant='outlined' onClick={handleAddMinutes(-15)}>
         - 15 m
       </Button>
-      <Button disabled={timeLimit === null} size='small' variant='outlined' onClick={addMinutes(15)}>
+      <Button disabled={timeLimit === null} size='small' variant='outlined' onClick={handleAddMinutes(15)}>
         + 15 m
       </Button>
     </DialogContent>

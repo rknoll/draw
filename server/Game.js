@@ -1,5 +1,5 @@
 import levenshtein from 'fast-levenshtein';
-import moment from 'moment';
+import { addMinutes } from 'date-fns';
 import { PING_TIMEOUT, SELECT_WORD_TIMEOUT, TICK_TIMEOUT } from '../shared/constants';
 import protocol from '../shared/protocol';
 
@@ -76,7 +76,7 @@ export default class {
       Math.round(TICK_TIMEOUT / 1000),
     ];
     this.roundTimeoutSeconds = turnTimeLimitSeconds;
-    if (durationMinutes) this.endTime = moment().add(durationMinutes, 'minutes');
+    if (durationMinutes) this.endTime = addMinutes(new Date(), durationMinutes);
     for (const player of this.players) {
       player.reset();
     }
@@ -125,7 +125,7 @@ export default class {
     this.roundTime = this.roundTimeoutSeconds;
 
     const roundFinished = meta && meta.reason !== 'SKIPPED';
-    if (roundFinished && this.started && this.endTime && moment() >= this.endTime) {
+    if (roundFinished && this.started && this.endTime && new Date() >= this.endTime) {
       this.gameOver(meta);
       return;
     }
