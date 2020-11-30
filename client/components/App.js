@@ -5,7 +5,7 @@ import useMediaQuery from '@material-ui/core/useMediaQuery';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { MuiPickersUtilsProvider } from '@material-ui/pickers';
-import MomentUtils from '@date-io/moment';
+import DateFnsUtils from '@date-io/date-fns';
 import mainTheme from '../theme';
 import LandingPage from './LandingPage';
 import GamePage from './GamePage';
@@ -19,7 +19,7 @@ export default ({ history }) => {
 
   return <ConnectedRouter history={history}>
     <ThemeProvider theme={mainTheme(prefersDarkMode)}>
-      <MuiPickersUtilsProvider utils={MomentUtils}>
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <CssBaseline />
         <Switch>
           <Route path='/' exact={true} component={LandingPage} />
