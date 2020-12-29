@@ -206,6 +206,24 @@ export default class {
     this.roundTimer = setTimeout(() => this.tickGameRound(), 1000);
   }
 
+  revealCharacter(player, index) {
+    // Only allow revealing characters when the player is allowed to draw.
+    if (!this.started || !this.canDraw(player)) return;
+    this.revealCharacterIndex(index);
+  }
+
+  revealCharacterIndex(index) {
+    if (!this.currentWordEncoded || this.currentWordEncoded.length <= index) return;
+    if (this.currentWordEncoded[index] !== '_') return;
+
+    this.currentWordEncoded =
+      this.currentWordEncoded.substring(0, index) +
+      this.currentWord[index] +
+      this.currentWordEncoded.substring(index + 1);
+
+    this.io.to(this.id).emit(protocol.CURRENT_WORD, { word: this.currentWordEncoded });
+  }
+
   guess(player, text) {
     if (this.compareGuess(player, text)) return;
     this.io.to(this.id).emit(protocol.GUESSED, { name: player.user.name, guess: text });
@@ -259,13 +277,7 @@ export default class {
 
       if (this.hintTimeouts.includes(this.roundTime) && indices.length >= 3) {
         const randomIndex = indices[Math.floor(Math.random() * indices.length)];
-
-        this.currentWordEncoded =
-          this.currentWordEncoded.substring(0, randomIndex) +
-          this.currentWord[randomIndex] +
-          this.currentWordEncoded.substring(randomIndex + 1);
-
-        this.io.to(this.id).emit(protocol.CURRENT_WORD, { word: this.currentWordEncoded });
+        this.revealCharacterIndex(randomIndex);
       }
     }
 

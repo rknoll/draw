@@ -54,4 +54,10 @@ export default class {
     const game = player && this.games[player.gameId];
     if (game) game.useWord(player, word);
   }
+
+  revealCharacter(playerId, index) {
+    const player = this.players[playerId];
+    const game = player && this.games[player.gameId];
+    if (game) game.revealCharacter(player, index);
+  }
 }

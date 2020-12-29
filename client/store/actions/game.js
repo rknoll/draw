@@ -22,6 +22,7 @@ export const types = actionTypes('game')({
   ROUND_TIME: 'ROUND_TIME',
   CLOSE_GUESS: 'CLOSE_GUESS',
   GAME_OVER: 'GAME_OVER',
+  REVEAL_CHARACTER: 'REVEAL_CHARACTER',
 });
 
 export default {
@@ -113,5 +114,9 @@ export default {
   gameOver: (data) => ({
     type: types.GAME_OVER,
     ...data,
+  }),
+  revealCharacter: (index) => ({
+    type: types.REVEAL_CHARACTER,
+    index,
   }),
 };
