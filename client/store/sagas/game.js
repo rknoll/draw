@@ -86,18 +86,20 @@ function* connectGame({ id, user }) {
     }
 
     while (true) {
-      const { guess, exited, sendCommand, start, useWord } = yield race({
+      const { guess, exited, sendCommand, start, useWord, revealCharacter } = yield race({
         guess: take(types.GUESS),
         exited: take(types.EXIT_GAME),
         sendCommand: take(types.SEND_COMMAND),
         start: take(types.START),
         useWord: take(types.USE_WORD),
+        revealCharacter: take(types.REVEAL_CHARACTER),
       });
       if (exited) break;
       if (guess) socket.emit(protocol.GUESS, guess.guess);
       if (sendCommand) socket.emit(protocol.COMMAND, sendCommand.command);
       if (start) socket.emit(protocol.START, start.options);
       if (useWord) socket.emit(protocol.USE_WORD, useWord.word);
+      if (revealCharacter) socket.emit(protocol.REVEAL_CHARACTER, revealCharacter.index);
     }
 
     socket.close();

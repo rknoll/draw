@@ -504,7 +504,7 @@ const Scratchpad = ({ connected, width, height, targetRef, tool, commands, sendC
 };
 
 const mapStateToProps = (state) => ({
-  canDraw: !state.game.started || state.game.selectedWord,
+  canDraw: !state.game.started || state.game.currentWord,
   commands: state.game.commands,
   connected: state.game.connected,
   tool: state.tool,

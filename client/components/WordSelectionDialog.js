@@ -16,13 +16,13 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-const WordSelectionDialog = ({ words, selectWord, currentWord }) => {
+const WordSelectionDialog = ({ words, selectWord, currentWordEncoded }) => {
   const classes = useStyles();
   const [isOpen, setIsOpen] = React.useState(false);
   const [targetTime, setTargetTime] = React.useState(0);
   const [progress, setProgress] = React.useState(0);
   const onSelect = (word) => () => selectWord(word);
-  const open = !!words && words.length > 0 && (!currentWord || !currentWord.length);
+  const open = !!words && words.length > 0 && (!currentWordEncoded || !currentWordEncoded.length);
 
   const updateProgress = () => {
     const now = Date.now();
@@ -61,7 +61,7 @@ const WordSelectionDialog = ({ words, selectWord, currentWord }) => {
 
 const mapStateToProps = (state) => ({
   words: state.game.words,
-  currentWord: state.game.currentWord,
+  currentWordEncoded: state.game.currentWordEncoded,
 });
 
 const mapDispatchToProps = {

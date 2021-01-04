@@ -57,4 +57,5 @@ export default {
       color: validColor,
     }),
   ]).match('one').required(),
+  [protocol.REVEAL_CHARACTER]: Joi.number().integer().min(0).max(255).required(),
 };

@@ -4,10 +4,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
-import Box from '@material-ui/core/Box';
 import Hidden from '@material-ui/core/Hidden';
 import gameActions from '../store/actions/game';
 import logo from '../../assets/logo.svg';
+import CurrentWord from './CurrentWord';
 
 const useStyles = makeStyles((theme) => ({
   header: {
@@ -31,19 +31,9 @@ const useStyles = makeStyles((theme) => ({
   exit: {
     marginLeft: 'auto',
   },
-  word: {
-    letterSpacing: 4,
-    fontSize: 14,
-    textAlign: 'center',
-    wordBreak: 'break-all',
-    [theme.breakpoints.up('sm')]: {
-      letterSpacing: 6,
-      fontSize: 24,
-    },
-  },
 }));
 
-const GameHeader = ({ singlePlayer, exit, setStarting, started, word }) => {
+const GameHeader = ({ singlePlayer, exit, setStarting, started }) => {
   const classes = useStyles();
   const start = () => setStarting(true);
 
@@ -61,7 +51,7 @@ const GameHeader = ({ singlePlayer, exit, setStarting, started, word }) => {
           Start
         </Hidden>
       </Button>}
-      {word && <Box className={classes.word} fontFamily='Monospace'>{word}</Box>}
+      <CurrentWord />
       <Button onClick={exit} className={classes.exit}>Exit</Button>
     </Grid>
   </Grid>;
@@ -69,7 +59,6 @@ const GameHeader = ({ singlePlayer, exit, setStarting, started, word }) => {
 
 const mapStateToProps = (state) => ({
   started: state.game.started,
-  word: state.game.selectedWord || state.game.currentWord,
   singlePlayer: state.game.players.length <= 1,
 });
 

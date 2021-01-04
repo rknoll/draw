@@ -12,7 +12,7 @@ const initialState = {
   started: false,
   words: [],
   currentWord: '',
-  selectedWord: '',
+  currentWordEncoded: '',
   currentPlayer: '',
   correct: [],
   points: {},
@@ -76,7 +76,7 @@ export default (state = initialState, action) => {
         started: false,
         words: [],
         currentWord: '',
-        selectedWord: '',
+        currentWordEncoded: '',
         currentPlayer: '',
         correct: [],
         points: {},
@@ -119,13 +119,13 @@ export default (state = initialState, action) => {
     case types.USE_WORD:
       return {
         ...state,
-        selectedWord: action.word,
+        currentWord: action.word,
         correct: [state.self],
       };
     case types.CORRECT_GUESS:
       return {
         ...state,
-        selectedWord: action.word,
+        currentWord: action.word,
       };
     case types.OTHER_CORRECT_GUESS: {
       let nextState = {
@@ -139,10 +139,10 @@ export default (state = initialState, action) => {
     case types.CURRENT_WORD: {
       let nextState = {
         ...state,
-        currentWord: action.word,
+        currentWordEncoded: action.word,
       };
       if (action.roundTime) nextState.roundTime = action.roundTime;
-      if (state.currentWord.length === 0 && nextState.currentWord.length > 0 && action.name) {
+      if (state.currentWordEncoded.length === 0 && nextState.currentWordEncoded.length > 0 && action.name) {
         nextState = addMessage(nextState, { type: 'DRAWING', name: action.name });
       }
       return nextState;
@@ -158,7 +158,7 @@ export default (state = initialState, action) => {
         commands: [],
         words: [],
         currentWord: '',
-        selectedWord: '',
+        currentWordEncoded: '',
         currentPlayer: action.user,
         correct: [action.user],
         points: action.points,
@@ -190,7 +190,7 @@ export default (state = initialState, action) => {
         commands: action.commands,
         words: [],
         currentWord: '',
-        selectedWord: '',
+        currentWordEncoded: '',
         currentPlayer: '',
         correct: [],
         points: action.points,
@@ -217,7 +217,7 @@ export default (state = initialState, action) => {
         commands: [],
         words: [],
         currentWord: '',
-        selectedWord: '',
+        currentWordEncoded: '',
         starting: false,
         started: false,
         currentPlayer: '',

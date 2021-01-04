@@ -90,6 +90,7 @@ io.sockets.on('connect', async (socket) => {
   socket.on(protocol.COMMAND, (command) => games.command(socket.id, command));
   socket.on(protocol.START, (options) => games.start(socket.id, options));
   socket.on(protocol.USE_WORD, (word) => games.useWord(socket.id, word));
+  socket.on(protocol.REVEAL_CHARACTER, (index) => games.revealCharacter(socket.id, index));
 });
 
 server.listen(port, () => log.info(`Listening on port ${port}!`));
