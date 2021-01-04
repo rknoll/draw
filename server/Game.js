@@ -40,7 +40,7 @@ export default class {
       id: this.id,
       players: this.users(),
       commands: this.commands,
-      currentWord: this.currentWordEncoded,
+      currentWordEncoded: this.currentWordEncoded,
       currentPlayer: this.currentPlayer,
       started: this.started,
       correct: [...this.guessed],
@@ -206,14 +206,19 @@ export default class {
     this.roundTimer = setTimeout(() => this.tickGameRound(), 1000);
   }
 
+  // Reveals the character at |index| to guessing players if the |player| is
+  // allowed to do so and a game is currently in progress.
   revealCharacter(player, index) {
-    // Only allow revealing characters when the player is allowed to draw.
     if (!this.started || !this.canDraw(player)) return;
     this.revealCharacterIndex(index);
   }
 
+  // Reveals the character at |index| and broadcasts the updated encoded word.
+  // No-op if |index| is out of bounds or that character has already been
+  // revealed.
   revealCharacterIndex(index) {
-    if (!this.currentWordEncoded || this.currentWordEncoded.length <= index) return;
+    if (!this.currentWordEncoded) return;
+    if (index < 0 || index >= this.currentWordEncoded.length) return;
     if (this.currentWordEncoded[index] !== '_') return;
 
     this.currentWordEncoded =

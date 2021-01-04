@@ -37,15 +37,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CurrentWord = ({ selectedWord, currentWord, revealCharacter }) => {
+const CurrentWord = ({ currentWord, currentWordEncoded, revealCharacter }) => {
   const classes = useStyles();
-  const word = selectedWord || currentWord;
+  const word = currentWord || currentWordEncoded;
   if (!word) return null;
 
   return <Box className={classes.word} fontFamily='Monospace'>
     {word.split('').map((letter, index) => {
-      const revealed = currentWord[index] !== '_' && currentWord[index] !== ' ' && selectedWord;
-      const clickable = currentWord[index] === '_' && selectedWord;
+      const encodedLetter = currentWordEncoded[index];
+      const revealed = encodedLetter !== '_' && encodedLetter !== ' ' && currentWord;
+      const clickable = encodedLetter === '_' && currentWord;
       const reveal = () => clickable && revealCharacter(index);
       const className = classnames(
         classes.character,
@@ -61,8 +62,8 @@ const CurrentWord = ({ selectedWord, currentWord, revealCharacter }) => {
 };
 
 const mapStateToProps = (state) => ({
-  selectedWord: state.game.selectedWord,
   currentWord: state.game.currentWord,
+  currentWordEncoded: state.game.currentWordEncoded,
 });
 
 const mapDispatchToProps = {

@@ -56,7 +56,7 @@ function* watchNextRound() {
       nextRoundData: take(types.NEXT_ROUND),
     });
     if (connectedData) {
-      hasWord = connectedData.data.currentWord.length > 0;
+      hasWord = connectedData.data.currentWordEncoded.length > 0;
     } else if (nextRoundData) {
       hasWord = false;
       nextRound(nextRoundData);

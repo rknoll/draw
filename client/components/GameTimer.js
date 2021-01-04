@@ -22,7 +22,7 @@ const GameTimer = ({ showRoundTime, roundTime, turnTimeLimitSeconds }) => {
 const mapStateToProps = (state) => ({
   roundTime: state.game.roundTime,
   turnTimeLimitSeconds: state.game.turnTimeLimitSeconds,
-  showRoundTime: state.game.currentWord && state.game.roundTime,
+  showRoundTime: state.game.currentWordEncoded && state.game.roundTime,
 });
 
 export default connect(mapStateToProps)(GameTimer);
