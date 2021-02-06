@@ -6,6 +6,7 @@ import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import Hidden from '@material-ui/core/Hidden';
 import gameActions from '../store/actions/game';
+import toolActions from '../store/actions/tool';
 import logo from '../../assets/logo.svg';
 import CurrentWord from './CurrentWord';
 
@@ -33,13 +34,13 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const GameHeader = ({ singlePlayer, exit, setStarting, started }) => {
+const GameHeader = ({ singlePlayer, exit, setStarting, started, updateTool }) => {
   const classes = useStyles();
   const start = () => setStarting(true);
 
   return <Grid container spacing={3} className={classes.header}>
     <Grid item xs={12} className={classes.headerCell}>
-      <img src={logo} className={classes.logo} />
+      <img src={logo} className={classes.logo} onClick={() => updateTool({ type: 'line', color: 'rainbow' })} />
       <Typography variant='h6' className={classes.name}>
         Draw!
       </Typography>
@@ -65,6 +66,7 @@ const mapStateToProps = (state) => ({
 const mapDispatchToProps = {
   exit: gameActions.exitGame,
   setStarting: gameActions.setStarting,
+  updateTool: toolActions.updateTool,
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(GameHeader);

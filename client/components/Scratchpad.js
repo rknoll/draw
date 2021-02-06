@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { withResizeDetector } from 'react-resize-detector';
 import parseColor from 'color-parse';
 import { makeStyles } from '@material-ui/core/styles';
+import { COLORS } from '../../shared/constants';
 import gameActions from '../store/actions/game';
 
 const canvasSize = {
@@ -31,7 +32,24 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const getToolCursor = (tool, scale) => {
+const distance = (from, to) => {
+  const dx = Math.abs(from.x - to.x);
+  const dy = Math.abs(from.y - to.y);
+  return Math.sqrt(dx * dx + dy * dy);
+};
+
+const getToolColor = (tool, rainbowLength) => {
+  if (tool.type === 'erase') {
+    return '#FFFFFF';
+  }
+  if (tool.color === 'rainbow') {
+    const colorIndex = Math.floor(rainbowLength / 50) % COLORS.length;
+    return COLORS[colorIndex];
+  }
+  return tool.color;
+};
+
+const getToolCursor = (tool, rainbowLength, scale) => {
   const brushCanvas = document.createElement('canvas');
   const brushCanvasCtx = brushCanvas.getContext('2d');
   brushCanvasCtx.imageSmoothingEnabled = false;
@@ -42,7 +60,7 @@ const getToolCursor = (tool, scale) => {
       brushCanvas.width = scaled(40);
       brushCanvas.height = scaled(40);
       brushCanvasCtx.clearRect(0, 0, scaled(40), scaled(40));
-      brushCanvasCtx.fillStyle = tool.type === 'erase' ? '#FFFFFF' : tool.color;
+      brushCanvasCtx.fillStyle = getToolColor(tool, rainbowLength);
       brushCanvasCtx.beginPath();
       brushCanvasCtx.arc(scaled(20), scaled(20), scaled((tool.type === 'erase' ? 20 : tool.width / 2)) - 1, 0, 2 * Math.PI);
       brushCanvasCtx.fill();
@@ -111,15 +129,16 @@ const Scratchpad = ({ connected, width, height, targetRef, tool, commands, sendC
   const classes = useStyles();
   const canvasRef = React.useRef(null);
   const [drawnCommands, setDrawnCommands] = React.useState([]);
+  const [rainbowLength, setRainbowLength] = React.useState(0);
 
   React.useEffect(() => clearCanvas(canvasRef.current), []);
   React.useEffect(() => resizeCanvas(canvasRef.current, width, height, connected), [canvasRef, width, height, connected]);
 
   React.useEffect(() => {
     if (!canvasRef.current) return;
-    const cursor = getToolCursor(tool, width / 800);
+    const cursor = getToolCursor(tool, rainbowLength, width / 800);
     canvasRef.current.style.cursor = cursor;
-  }, [canvasRef, tool, width, height]);
+  }, [canvasRef, tool, width, height, rainbowLength]);
 
   const [isPainting, setIsPainting] = React.useState(false);
   const [mousePosition, setMousePosition] = React.useState(undefined);
@@ -394,12 +413,13 @@ const Scratchpad = ({ connected, width, height, targetRef, tool, commands, sendC
     if (!canDraw) return;
     sendCommand({
       type: tool.type,
-      color: tool.color,
+      color: getToolColor(tool, rainbowLength),
       width: tool.width,
       from,
       to,
     });
-  }, [tool, canDraw]);
+    setRainbowLength(rainbowLength + distance(from, to));
+  }, [tool, canDraw, rainbowLength]);
 
   const eraseLine = React.useCallback((from, to) => {
     if (!canDraw) return;

@@ -64,7 +64,9 @@ const Controls = ({ tool, updateTool, sendCommand }) => {
 
   const renderColor = (color) => {
     const borderStyle = {};
-    if (tool.color !== color) borderStyle.borderColor = 'transparent';
+    if (tool.color !== color && tool.color !== 'rainbow') {
+      borderStyle.borderColor = 'transparent';
+    }
     return <div
       key={color}
       className={classes.tool}
