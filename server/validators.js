@@ -1,5 +1,7 @@
 import Joi from 'joi/lib/index';
 import {
+  CANVAS_HEIGHT,
+  CANVAS_WIDTH,
   COLORS,
   MAX_GAME_DURATION_MINUTES,
   MAX_TURN_TIME_LIMIT_SECONDS,
@@ -10,8 +12,8 @@ import {
 import protocol from '../shared/protocol';
 
 const validPosition = Joi.object({
-  x: Joi.number().min(0).max(800).required(),
-  y: Joi.number().min(0).max(600).required(),
+  x: Joi.number().min(0).max(CANVAS_WIDTH).required(),
+  y: Joi.number().min(0).max(CANVAS_HEIGHT).required(),
 }).required();
 
 const validColor = Joi.string().valid(...COLORS).required();
