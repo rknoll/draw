@@ -33,8 +33,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const distance = (from, to) => {
-  const dx = Math.abs(from.x - to.x);
-  const dy = Math.abs(from.y - to.y);
+  const dx = from.x - to.x;
+  const dy = from.y - to.y;
   return Math.sqrt(dx * dx + dy * dy);
 };
 
