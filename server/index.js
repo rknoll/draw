@@ -55,10 +55,10 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(statics, 'index.html'));
 });
 
-io.sockets.on('connect', async (socket) => {
+io.on('connection', (socket) => {
   log.info(`${socket.id}: connected`);
 
-  socket.on('disconnect', async () => {
+  socket.on('disconnect', () => {
     games.leave(socket.id);
     log.info(`${socket.id}: disconnected. Running games: ${Object.keys(games.games).length}`);
   });
@@ -66,24 +66,17 @@ io.sockets.on('connect', async (socket) => {
   socket.use(([message, data], next) => {
     const validator = validators[message];
     if (!validator || validator.validate(data).error) {
-      log.warn(`${socket.id}: invalid message: ${JSON.stringify(data)}`);
-      return next(new Error('error'));
+      return next(new Error(`${socket.id}: invalid message: ${JSON.stringify(data)}`));
     }
     next();
   });
 
-  socket.on(protocol.JOIN, async (data) => {
+  socket.on(protocol.JOIN, (data) => {
     const { id, user } = data;
     Object.keys(socket.rooms).forEach((room) => socket.leave(room));
-    socket.join(id, (err) => {
-      if (err) {
-        log.error(`Failed to join ${socket.id} with ${id}`);
-        socket.disconnect(true);
-        return;
-      }
-      games.join(socket, id, user);
-      log.info(`${socket.id}: joined ${id} as ${user && user.name || '<unknown>'}. Running games: ${Object.keys(games.games).length}`);
-    });
+    socket.join(id);
+    games.join(socket, id, user);
+    log.info(`${socket.id}: joined ${id} as ${user && user.name || '<unknown>'}. Running games: ${Object.keys(games.games).length}`);
   });
 
   socket.on(protocol.GUESS, (guess) => games.guess(socket.id, guess));
@@ -91,6 +84,10 @@ io.sockets.on('connect', async (socket) => {
   socket.on(protocol.START, (options) => games.start(socket.id, options));
   socket.on(protocol.USE_WORD, (word) => games.useWord(socket.id, word));
   socket.on(protocol.REVEAL_CHARACTER, (index) => games.revealCharacter(socket.id, index));
+
+  socket.on('error', (error) => {
+    log.warn(error && error.message);
+  });
 });
 
 server.listen(port, () => log.info(`Listening on port ${port}!`));

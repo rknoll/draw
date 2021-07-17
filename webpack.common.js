@@ -2,9 +2,8 @@ const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const FaviconsWebpackPlugin = require('favicons-webpack-plugin');
-const ServiceWorkerWebpackPlugin = require('serviceworker-webpack-plugin');
 const Dotenv = require('dotenv-webpack');
-const GitRevisionPlugin = require('git-revision-webpack-plugin');
+const { GitRevisionPlugin } = require('git-revision-webpack-plugin');
 const gitRevisionPlugin = new GitRevisionPlugin();
 
 require('dotenv-defaults').config();
@@ -76,9 +75,6 @@ module.exports = {
       systemvars: true,
       silent: true,
       defaults: true,
-    }),
-    new ServiceWorkerWebpackPlugin({
-      entry: path.join(__dirname, 'client/sw.js'),
     }),
     !process.env.COMMITHASH && gitRevisionPlugin,
     new webpack.DefinePlugin({
