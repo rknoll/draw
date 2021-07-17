@@ -28,3 +28,7 @@ built assets to a `public` folder. You then need to deploy that along with the n
 This repo does not contain a wordlist or sounds for the game. You can provide your own and put them into
 [data/words.json](data/words.json) and [assets/sounds](assets/sounds) or override the path to those with custom
 environment variables `WORDS_FILE` (at runtime) and `SOUND_FILES` (at build time).
+
+## History
+
+To record per-game history you can pass a folder via the `HISTORY_FOLDER` environment variable at runtime. If empty (by default) no history will be recorded. At the end of each game the server will generate a json file with the complete history of that game and store it in the folder.

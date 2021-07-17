@@ -2,6 +2,7 @@ import levenshtein from 'fast-levenshtein';
 import { addMinutes } from 'date-fns';
 import { PING_TIMEOUT, SELECT_WORD_TIMEOUT, TICK_TIMEOUT } from '../shared/constants';
 import protocol from '../shared/protocol';
+import History from './history';
 
 const words = require(`../${process.env.WORDS_FILE}`);
 
@@ -25,6 +26,7 @@ export default class {
   selectTimer = null;
   hintTimeouts = [];
   endTime = null;
+  history = null;
 
   constructor(io, id) {
     this.io = io;
@@ -66,9 +68,11 @@ export default class {
   join(player) {
     this.players.push(player);
     this.updateGame({ reason: 'JOIN', name: player.user.name });
+    if (this.history) this.history.addEvent('join', { ...player.user, id: player.id });
   }
 
-  start({ turnTimeLimitSeconds, durationMinutes }) {
+  start(options) {
+    const { turnTimeLimitSeconds, durationMinutes } = options;
     if (this.started || this.players.length <= 1) return;
     this.started = true;
     this.hintTimeouts = [
@@ -83,6 +87,8 @@ export default class {
     this.commands = [];
     const nextPlayer = this.nextPlayer();
     if (!nextPlayer) return;
+    if (this.history) this.history.close();
+    this.history = new History(this, options);
     this.io.to(this.id).emit(protocol.START, { user: nextPlayer.id, turnTimeLimitSeconds });
     this.sendWordCandidates();
   }
@@ -90,6 +96,7 @@ export default class {
   leave(player) {
     this.guessed.delete(player.id);
     this.players = this.players.filter((p) => p.id !== player.id);
+    if (this.history) this.history.addEvent('leave', { id: player.id });
 
     if (!this.players.length) {
       clearInterval(this.pingTimer);
@@ -138,6 +145,13 @@ export default class {
       meta,
     });
     this.sendWordCandidates();
+    if (this.history) {
+      this.history.addEvent('nextRound', {
+        id: this.currentPlayer,
+        words: this.currentCandidates,
+        meta,
+      });
+    }
   }
 
   sendWordCandidates() {
@@ -167,6 +181,7 @@ export default class {
     if (!this.canDraw(player)) return;
     this.commands.push({ id: player.id, command });
     this.io.to(this.id).emit(protocol.COMMAND, { id: player.id, command });
+    if (this.history) this.history.addEvent('draw', { id: player.id, command });
   }
 
   canDraw(player) {
@@ -204,6 +219,13 @@ export default class {
     if (this.roundTimer) clearTimeout(this.roundTimer);
     this.roundTime = this.roundTimeoutSeconds;
     this.roundTimer = setTimeout(() => this.tickGameRound(), 1000);
+    if (this.history) {
+      this.history.addEvent('useWord', {
+        id: player.id,
+        word,
+        encoded: this.currentWordEncoded,
+      });
+    }
   }
 
   // Reveals the character at |index| to guessing players if the |player| is
@@ -227,9 +249,21 @@ export default class {
       this.currentWordEncoded.substring(index + 1);
 
     this.io.to(this.id).emit(protocol.CURRENT_WORD, { word: this.currentWordEncoded });
+    if (this.history) {
+      this.history.addEvent('revealCharacter', {
+        index,
+        encoded: this.currentWordEncoded,
+      });
+    }
   }
 
   guess(player, text) {
+    if (this.history) {
+      this.history.addEvent('guess', {
+        id: player.id,
+        text,
+      });
+    }
     if (this.compareGuess(player, text)) return;
     this.io.to(this.id).emit(protocol.GUESSED, { name: player.user.name, guess: text });
   }
@@ -327,6 +361,8 @@ export default class {
       meta,
       commands: this.commands,
     });
+    if (this.history) this.history.close();
+    this.history = null;
   }
 
   reset() {
@@ -350,5 +386,7 @@ export default class {
       player.reset();
     }
     this.io.to(this.id).emit(protocol.RESET);
+    if (this.history) this.history.close();
+    this.history = null;
   }
 };
