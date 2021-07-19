@@ -6,7 +6,7 @@ import path from 'path';
 let folder = process.env.HISTORY_FOLDER && path.resolve(process.env.HISTORY_FOLDER);
 if (!fs.existsSync(folder)) folder = null;
 
-export default class {
+class History {
   events = [];
 
   constructor(game, options) {
@@ -28,7 +28,6 @@ export default class {
   }
 
   flush() {
-    if (!folder) return;
     const fileName = path.join(folder, `${this.startTime}-${this.id}.json`);
     fs.writeFileSync(fileName, JSON.stringify({
       historyId: this.id,
@@ -46,4 +45,9 @@ export default class {
       ...data,
     });
   }
+};
+
+export default (game, options) => {
+  if (!folder) return null;
+  return new History(game, options);
 };
