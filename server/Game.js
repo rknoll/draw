@@ -2,7 +2,7 @@ import levenshtein from 'fast-levenshtein';
 import { addMinutes } from 'date-fns';
 import { PING_TIMEOUT, SELECT_WORD_TIMEOUT, TICK_TIMEOUT } from '../shared/constants';
 import protocol from '../shared/protocol';
-import createHistory from './history';
+import createHistory from './History';
 
 const words = require(`../${process.env.WORDS_FILE}`);
 
