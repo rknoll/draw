@@ -3,25 +3,11 @@ import express from 'express';
 import http from 'http';
 import compression from 'compression';
 import socketIO from 'socket.io';
-import bunyan from 'bunyan';
 import expressBunyanLogger from 'express-bunyan-logger';
-import bunyanDebugStream from 'bunyan-debug-stream';
 import protocol from '../shared/protocol';
 import validators from './validators';
 import Games from './Games';
-
-const log = bunyan.createLogger({
-  name: 'draw',
-  streams: [{
-    level: 'info',
-    type: 'raw',
-    stream: bunyanDebugStream({
-      basepath: __dirname, // this should be the root folder of your project.
-      forceColor: true,
-    }),
-  }],
-  serializers: bunyanDebugStream.serializers
-});
+import log from './Logger';
 
 const statics = path.join(__dirname, '../public');
 
