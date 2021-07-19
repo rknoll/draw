@@ -1,6 +1,6 @@
-import { createMuiTheme } from '@material-ui/core/styles';
+import { createTheme } from '@material-ui/core/styles';
 import blue from '@material-ui/core/colors/blue';
-import 'fontsource-roboto';
+import '@fontsource/roboto';
 import XkcdScriptWoff from '../../assets/fonts/xkcd-script/xkcd-script.woff';
 
 const XkcdScript = {
@@ -11,7 +11,7 @@ const XkcdScript = {
   src: `url(${XkcdScriptWoff}) format('woff')`,
 };
 
-export default (dark) => createMuiTheme({
+export default (dark) => createTheme({
   palette: {
     type: dark ? 'dark' : 'light',
     primary: {

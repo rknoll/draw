@@ -2,7 +2,7 @@ import { eventChannel } from 'redux-saga';
 import { call, fork, put, race, select, take, takeEvery } from 'redux-saga/effects'
 import { LOCATION_CHANGE, push } from 'connected-react-router';
 import { v4 as uuidv4 } from 'uuid';
-import io from 'socket.io-client';
+import { io } from 'socket.io-client';
 import gameActions, { types } from '../actions/game';
 import protocol from '../../../shared/protocol';
 
