@@ -1,10 +1,14 @@
 import levenshtein from 'fast-levenshtein';
 import { addMinutes } from 'date-fns';
-import { PING_TIMEOUT, SELECT_WORD_TIMEOUT, TICK_TIMEOUT } from '../shared/constants';
+import { PING_TIMEOUT, SELECT_WORD_TIMEOUT, TICK_TIMEOUT, MAX_CANDIDATES } from '../shared/constants';
 import protocol from '../shared/protocol';
 import createHistory from './History';
 
-const words = require(`../${process.env.WORDS_FILE}`);
+const words = [...new Set(require(`../${process.env.WORDS_FILE}`))].filter(Boolean);
+
+if (words.length < 3) {
+  throw new Error('Expect to receive a list containing at least 3 valid and unique words.');
+}
 
 const encodeWord = (word) => [...word].map((c) => c === ' ' ? c : '_').join('');
 
@@ -154,21 +158,34 @@ export default class {
     }
   }
 
+  getShuffledCandidates() {
+    const availableWords = words.filter(word => !this.words.has(word));
+    const cycleLimit = (availableWords.length - 1) - MAX_CANDIDATES;
+    
+    for (let i = availableWords.length - 1; i > 0 && i > cycleLimit; i--) {
+      const randomIndex = Math.floor(Math.random() * (i + 1));
+      const refWordSwapped = availableWords[i];
+      availableWords[i] = availableWords[randomIndex];
+      availableWords[randomIndex] = refWordSwapped;
+    }
+  
+    return availableWords.slice(-MAX_CANDIDATES);
+  }
+
   sendWordCandidates() {
     const player = this.nextPlayer();
     if (!player) return;
 
     this.currentPlayer = player.id;
-    const candidates = [];
-    if (this.words.size > words.length / 2) this.words.clear();
-    while (candidates.length !== 3) {
-      const index = Math.floor(Math.random() * words.length);
-      const word = words[index];
-      if (!word || this.words.has(word)) continue;
-      candidates.push(word);
-    }
-    this.currentCandidates = candidates;
-    player.socket.emit(protocol.SELECT_WORD, { words: candidates });
+
+    const shouldClearWordsPlayed =
+    this.words.size > words.length / 2 ||
+    words.length - this.words.size < MAX_CANDIDATES;    
+    if (shouldClearWordsPlayed) this.words.clear();
+
+    this.currentCandidates = this.getShuffledCandidates();
+
+    player.socket.emit(protocol.SELECT_WORD, { words: this.currentCandidates });
     ++this.round;
     if (this.selectTimer) clearTimeout(this.selectTimer);
     this.selectTimer = setTimeout(() => this.nextRound({
