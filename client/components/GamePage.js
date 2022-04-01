@@ -1,4 +1,5 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
@@ -89,8 +90,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default () => {
+const BEFORE_UNLOAD_MESSAGE = 'Exit drawing game?';
+
+const GamePage = ({ started }) => {
   const classes = useStyles();
+
+  const handleBeforeUnload = (e) => {
+    (e || window.event).returnValue = BEFORE_UNLOAD_MESSAGE;
+    return BEFORE_UNLOAD_MESSAGE;
+  };
+
+  React.useEffect(() => {
+    if (!started) return;
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [started]);
+
   return <div className={classes.root}>
     <Paper className={classes.paper}>
       <GameTimer />
@@ -116,3 +131,9 @@ export default () => {
     </Paper>
   </div>;
 };
+
+const mapStateToProps = (state) => ({
+  started: state.game.started,
+});
+
+export default connect(mapStateToProps)(GamePage);

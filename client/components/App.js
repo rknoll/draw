@@ -12,6 +12,7 @@ import GamePage from './GamePage';
 import UserNameDialog from './UserNameDialog';
 import WordSelectionDialog from './WordSelectionDialog';
 import StartGameDialog from './StartGameDialog';
+import ExitGameDialog from './ExitGameDialog';
 import Snackbars from './Snackbars';
 
 export default ({ history }) => {
@@ -28,6 +29,7 @@ export default ({ history }) => {
         <UserNameDialog />
         <WordSelectionDialog />
         <StartGameDialog />
+        <ExitGameDialog />
         <Snackbars />
       </MuiPickersUtilsProvider>
     </ThemeProvider>
