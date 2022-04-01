@@ -23,6 +23,7 @@ export const types = actionTypes('game')({
   CLOSE_GUESS: 'CLOSE_GUESS',
   GAME_OVER: 'GAME_OVER',
   REVEAL_CHARACTER: 'REVEAL_CHARACTER',
+  SET_EXIT_GAME_DIALOG_OPEN: 'SET_EXIT_GAME_DIALOG_OPEN',
 });
 
 export default {
@@ -118,5 +119,9 @@ export default {
   revealCharacter: (index) => ({
     type: types.REVEAL_CHARACTER,
     index,
+  }),
+  setExitGameDialogOpen: (open) => ({
+    type: types.SET_EXIT_GAME_DIALOG_OPEN,
+    open,
   }),
 };

@@ -7,7 +7,9 @@ import gameActions, { types } from '../actions/game';
 import protocol from '../../../shared/protocol';
 
 function connect() {
-  const socket = io('/');
+  const socket = io('/', {
+    closeOnBeforeunload: false,
+  });
   return new Promise((resolve, reject) => {
     socket.on('connect', () => {
       resolve(socket);

@@ -18,6 +18,7 @@ const initialState = {
   points: {},
   roundTime: 0,
   turnTimeLimitSeconds: 0,
+  exitGameDialogOpen: false,
 };
 
 const addMessage = (state, message) => ({ ...state, guesses: [...state.guesses, message] });
@@ -82,6 +83,7 @@ export default (state = initialState, action) => {
         points: {},
         roundTime: 0,
         turnTimeLimitSeconds: 0,
+        exitGameDialogOpen: false,
       };
     case types.GUESSED:
       return addMessage(state, { type: 'GUESS', name: action.name, guess: action.guess, correct: action.correct });
@@ -225,6 +227,12 @@ export default (state = initialState, action) => {
         points: {},
         roundTime: 0,
         turnTimeLimitSeconds: 0,
+        exitGameDialogOpen: false,
+      };
+    case types.SET_EXIT_GAME_DIALOG_OPEN:
+      return {
+        ...state,
+        exitGameDialogOpen: action.open,
       };
     default:
       return state;

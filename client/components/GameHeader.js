@@ -34,9 +34,10 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const GameHeader = ({ singlePlayer, exit, setStarting, started, updateTool }) => {
+const GameHeader = ({ singlePlayer, exitGame, showExitDialog, setStarting, started, updateTool }) => {
   const classes = useStyles();
   const start = () => setStarting(true);
+  const exit = started ? showExitDialog : exitGame;
 
   return <Grid container spacing={3} className={classes.header}>
     <Grid item xs={12} className={classes.headerCell}>
@@ -64,7 +65,8 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = {
-  exit: gameActions.exitGame,
+  exitGame: gameActions.exitGame,
+  showExitDialog: () => gameActions.setExitGameDialogOpen(true),
   setStarting: gameActions.setStarting,
   updateTool: toolActions.updateTool,
 };
