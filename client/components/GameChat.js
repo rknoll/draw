@@ -45,7 +45,7 @@ const GameChat = ({ sendGuess, guesses }) => {
       {[...guesses].reverse().map((message, index) => <ChatMessage key={index} message={message} />)}
     </div>
     <form className={classes.guessForm} onSubmit={submitGuess}>
-      <TextField label='Guess' variant='outlined' size='small' inputRef={guess} />
+      <TextField label='Guess' variant='outlined' size='small' inputRef={guess} autoComplete='off' name='Guess' />
     </form>
   </React.Fragment>;
 };
