@@ -94,6 +94,8 @@ const LandingPage = ({ name, createGame, joinGame, changeName }) => {
             label='id'
             fullWidth
             inputRef={joinIdRef}
+            autoComplete='off'
+            name='id'
           />
         </form>
       </DialogContent>

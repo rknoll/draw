@@ -28,6 +28,8 @@ const UserNameDialog = ({ name, setName }) => {
           label='Name'
           fullWidth
           inputRef={nameRef}
+          autoComplete='off'
+          name='Name'
         />
       </form>
     </DialogContent>
